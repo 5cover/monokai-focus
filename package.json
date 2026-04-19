@@ -1,0 +1,21 @@
+{
+  "name": "monokai-focus",
+  "displayName": "Monokai Focus",
+  "description": "A semantics-driven theme that minimizes visual noise by using color and typography only where they meaningfully disambiguate code.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.116.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "Monokai Focus",
+        "uiTheme": "vs-dark",
+        "path": "./themes/Monokai Focus-color-theme.json"
+      }
+    ]
+  }
+}
