@@ -280,28 +280,28 @@ syntax
 - hsl(60, 30%, 96%): White Smoke
   - identifiers
   - punctuation
-- hsl(324, 80%, 82%): Shell pink
+- hsl(339, 80%, 82%): Shell pink
   - language provided bindings
-- hsl(252, 77%, 78%): Lilac
+- hsl(250, 77%, 78%): Lilac
   - functions
-- hsl(36, 96%, 70%): Apricot
+- hsl(20, 96%, 70%): Apricot
   - comments
 - hsl(60, 1%, 53%): Gray
   - documentation
-- hsl(180, 53%, 66%): Celadon Green
+- hsl(138, 53%, 66%): Celadon Green
   - types
-- hsl(72, 100%, 70%): Honey Orange
+- hsl(50, 100%, 70%): Honey Orange
   - text
-- hsl(108, 54%, 61%): Sand Brown
+- hsl(30, 54%, 61%): Sand Brown
   - leaves
   - escape sequences
-- hsl(144, 78%, 61%): Light Green
+- hsl(144, 61%, 73%)en
   - operations
-- hsl(216, 71%, 69%): Sky Blue
+- hsl(200, 71%, 69%): Sky Blue
   - declarations
-- hsl(288, 90%, 69%): Light Coral
+- hsl(345, 90%, 69%): Light Coral
   - instructions
-- hsl(0, 90%, 60%): Persimmon
+- #f53d3d: Persimmon
   - invalid
 - hsl(60, 30%, 96%): White Smoke, hsl(60, 4%, 75%): Silver, hsl(60, 1%, 59%): Rosy Brown
   - bracket pairs
@@ -328,3 +328,21 @@ what doesn't seem to be doable with native syntax highlighting tools.
 - catch variable in italics
 - color only expression-level commas as separators
 - coloring break and continue, goto, and for await as instructions (keyword.control.loop everywhere)
+
+monokai pro colors
+
+- hsl(285, 5%, 17%)
+- hsl(60, 25%, 98%)
+- hsl(20, 96%, 70%) : comment
+- hsl(45, 100%, 70%) : text
+- hsl(90, 59%, 66%) : type, leaf
+- hsl(186, 71%, 69%) : declaration, operation
+- hsl(250, 77%, 78%) : function
+- hsl(345, 100%, 69%) : instruction
+- hsl(0, 1%, 76%)
+- hsl(300, 1%, 57%)
+- hsl(300, 1%, 44%)
+- hsl(280, 2%, 36%)
+- hsl(280, 2%, 25%)
+- hsl(300, 5%, 13%)
+- hsl(270, 4%, 10%)

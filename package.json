@@ -9,13 +9,21 @@
   "categories": [
     "Themes"
   ],
+  "type": "module",
   "contributes": {
     "themes": [
       {
         "label": "Monokai Focus",
         "uiTheme": "vs-dark",
-        "path": "./themes/Monokai Focus-color-theme.json"
+        "path": "./themes/monokai-focus-color-theme.json"
       }
     ]
+  },
+  "devDependencies": {
+    "@types/nearest-color": "^0.4.1",
+    "@types/node": "^25.6.0",
+    "color": "^5.0.3",
+    "color-name-list": "^14.36.0",
+    "nearest-color": "^0.4.4"
   }
 }
