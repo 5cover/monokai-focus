@@ -22,7 +22,8 @@ const c = {
     leaf: color('hsl(140, 60%, 70%)'),
     declaration: color('hsl(200, 60%, 66%)'),
     operation: color('hsl(250, 70%, 78%)'),
-    instruction: color('hsl(345, 80%, 75%)'),
+    //instruction: color('hsl(345, 80%, 75%)'),
+    instruction: color('hsl(0, 90%, 70%)'),
 } as const
 
 console.table(
