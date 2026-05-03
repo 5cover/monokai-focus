@@ -75,7 +75,7 @@ export function cross(...rules: TokenRule[]): CrossRule {
 }
 
 export function compileTokenColors(rules: readonly Rule[], options: CompileOptions = {}): TmTokenColor[] {
-    return rules.flatMap((item) => compileRule(item, options))
+    return rules.flatMap(item => compileRule(item, options))
 }
 
 function compileRule(item: Rule, options: CompileOptions): TmTokenColor[] {
@@ -90,7 +90,7 @@ function compileTokenRule(item: TokenRule, options: CompileOptions): TmTokenColo
     if (item.no) {
         const resetStyle = invertStyle(item.style, options)
         const resetScopes = uniqueSorted(
-            expandScope(item.no).flatMap((excluded) => scopes.map((scope) => `${excluded} ${scope}`)),
+            expandScope(item.no).flatMap(excluded => scopes.map(scope => `${excluded} ${scope}`)),
         )
         compiled.push(toTokenColor({ ...resetStyle, name: `${item.style.name ?? 'Rule'} reset` }, resetScopes))
     }
@@ -99,7 +99,7 @@ function compileTokenRule(item: TokenRule, options: CompileOptions): TmTokenColo
 }
 
 function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] {
-    const base = item.rules.flatMap((item) => compileTokenRule(item, options))
+    const base = item.rules.flatMap(item => compileTokenRule(item, options))
     const combinations: TmTokenColor[] = []
 
     for (let size = 2; size <= item.rules.length; size++) {
@@ -110,8 +110,8 @@ function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] 
             }
             const orders = permutations(group)
             const scopes = uniqueSorted(
-                orders.flatMap((ordered) =>
-                    cartesian(ordered.map((item) => expandScope(item.on))).map((parts) => parts.join(' ')),
+                orders.flatMap(ordered =>
+                    cartesian(ordered.map(item => expandScope(item.on))).map(parts => parts.join(' ')),
                 ),
             )
             combinations.push(toTokenColor(style, scopes))
@@ -122,7 +122,7 @@ function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] 
 }
 
 function combinedName(rules: readonly TokenRule[]): Pick<Style, 'name'> {
-    const names = rules.flatMap((item) => (item.style.name ? [item.style.name] : []))
+    const names = rules.flatMap(item => (item.style.name ? [item.style.name] : []))
     return names.length > 0 ? { name: names.join('&') } : {}
 }
 
@@ -149,14 +149,15 @@ function normalizeFontStyle(value: Style['in']): string {
     const items = toFontStyleArray(value)
     if (items.length === 0) return ''
     const styles = new Set(items)
-    return fontStyleOrder.filter((style) => styles.has(style)).join(' ')
+    return fontStyleOrder.filter(style => styles.has(style)).join(' ')
 }
 
 function invertStyle(style: Style, options: CompileOptions): Style {
     const reset: Style = {}
 
     if ('fg' in style) {
-        if (!('defaultForeground' in options)) throw new Error('compileTokenColors requires defaultForeground for fg exclusions')
+        if (!('defaultForeground' in options))
+            throw new Error('compileTokenColors requires defaultForeground for fg exclusions')
         reset.fg = options.defaultForeground
     }
 
@@ -190,16 +191,16 @@ function toFontStyleArray(value: Style['in']): FontStyle[] {
 
 function uniqueFontStyles(items: readonly FontStyle[]): FontStyle[] {
     const styles = new Set(items)
-    return fontStyleOrder.filter((style) => styles.has(style))
+    return fontStyleOrder.filter(style => styles.has(style))
 }
 
 function expandScope(scope: Scope): string[] {
     if (typeof scope === 'string') return expandAtom(scope)
     if (isScopeArray(scope)) {
-        return cartesian(scope.map(expandScope)).map((parts) => parts.filter(Boolean).join('.'))
+        return cartesian(scope.map(expandScope)).map(parts => parts.filter(Boolean).join('.'))
     }
     if (scope.type === 'any') return scope.parts.flatMap(expandScope)
-    return cartesian(scope.parts.map(expandScope)).map((parts) => parts.filter(Boolean).join(' '))
+    return cartesian(scope.parts.map(expandScope)).map(parts => parts.filter(Boolean).join(' '))
 }
 
 function isScopeArray(scope: Scope): scope is readonly Scope[] {
@@ -207,30 +208,25 @@ function isScopeArray(scope: Scope): scope is readonly Scope[] {
 }
 
 function expandAtom(atom: string): string[] {
-    return cartesian(atom.split('.').map((segment) => segment.split(':'))).map((parts) =>
-        parts.filter(Boolean).join('.'),
-    )
+    return cartesian(atom.split('.').map(segment => segment.split(':'))).map(parts => parts.filter(Boolean).join('.'))
 }
 
 function cartesian<T>(sets: readonly (readonly T[])[]): T[][] {
-    return sets.reduce<T[][]>((rows, set) => rows.flatMap((row) => set.map((item) => [...row, item])), [[]])
+    return sets.reduce<T[][]>((rows, set) => rows.flatMap(row => set.map(item => [...row, item])), [[]])
 }
 
 function combinationsOf<T>(items: readonly T[], size: number): T[][] {
     if (size === 0) return [[]]
     if (items.length < size) return []
     const [head, ...tail] = items
-    return [
-        ...combinationsOf(tail, size - 1).map((items) => [head, ...items]),
-        ...combinationsOf(tail, size),
-    ]
+    return [...combinationsOf(tail, size - 1).map(items => [head, ...items]), ...combinationsOf(tail, size)]
 }
 
 function permutations<T>(items: readonly T[]): T[][] {
     if (items.length <= 1) return [[...items]]
     return items.flatMap((item, index) => {
         const rest = items.filter((_, restIndex) => restIndex !== index)
-        return permutations(rest).map((permutation) => [item, ...permutation])
+        return permutations(rest).map(permutation => [item, ...permutation])
     })
 }
 

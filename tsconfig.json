@@ -1,11 +1,14 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "nodenext",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
     "checkJs": false,
     "experimentalDecorators": false,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strict": true,
+    "allowSyntheticDefaultImports": true,
     "types": [
       "node"
     ]

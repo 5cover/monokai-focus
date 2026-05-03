@@ -2,13 +2,12 @@ import nearestColor from 'nearest-color'
 import { colornames } from 'color-name-list'
 import color, { type ColorInstance } from 'color'
 import { writeFileSync } from 'fs'
-import { any, c as ctx, compileTokenColors, cross, rule } from './decleme'
+import { any, c as ctx, compileTokenColors, cross, rule } from './decleme.ts'
 
 // nearestColor expects an object { name => hex }
 const colors = colornames.reduce((o, { name, hex }) => Object.assign(o, { [name]: hex }), {})
 const _nearest = nearestColor.from(colors)
 const nearest = (c: ColorInstance) => _nearest(c.hex())
-interface A {}
 
 const core = {
     green: color('hsl(90, 59%, 66%)'),
@@ -49,6 +48,106 @@ console.table(
 )
 
 const theme = {
+    semanticHighlighting: true,
+    semanticTokenColors: {
+        '*.deprecated': {
+            fontStyle: 'strikethrough',
+        },
+        comment: c.comment,
+        decorator: c.function,
+        enum: c.type,
+        //enumMember: c.fg,
+        //event: c.fg,
+        function: c.function,
+        interface: c.type,
+        keyword: c.instruction,
+        label: c.fg,
+        macro: c.function,
+        method: c.function,
+        namespace: c.type,
+        number: c.leaf,
+        operator: c.operation,
+        parameter: {
+            fontStyle: 'italic',
+            foreground: c.fg,
+        },
+        regexp: c.text,
+        string: c.text,
+        struct: c.type,
+        type: c.type,
+        typeParameter: {
+            fontStyle: 'italic',
+            foreground: c.type,
+        },
+        variable: c.fg,
+    },
+    tokenColors: compileTokenColors(
+        [
+            rule({ name: 'Illegal', fg: c.invalid, in: 'bold' }, 'invalid.illegal'),
+            rule({ name: 'Deprecated', in: 'strikethrough' }, 'invalid.deprecated'),
+            rule({ name: 'Comment', fg: c.comment }, 'comment'),
+            rule({ name: 'Documentation', fg: c.fg2_5 }, any('comment.block.documentation', 'comment.documentation')),
+            rule({ name: 'Documentation syntax', fg: c.fg2 }, 'storage.type.class.jsdoc'),
+            rule({ name: 'Constant', fg: c.leaf }, 'constant'),
+            rule({ name: 'Text', fg: c.text }, 'string'),
+            rule(
+                { name: 'Language variables', fg: c.langvar, in: 'italic' },
+                any('variable.language', 'keyword.control.import'),
+            ),
+            rule(
+                { name: 'Whites', fg: c.fg },
+                any(
+                    'punctuation.definition.template-expression',
+                    'punctuation.accessor.optional',
+                    'keyword.operator.type.annotation',
+                    'meta.brace',
+                    'meta.object-literal.key',
+                ),
+            ),
+            rule(
+                { name: 'Types', fg: c.type },
+                any('support.type', 'entity.name.type', 'keyword.type', 'punctuation.definition.typeparameters'),
+            ),
+            rule({ name: 'Functions', fg: c.function }, any('entity.name.function', 'meta.decorator')),
+            rule(
+                { name: 'Declarations', fg: c.declaration },
+                any(
+                    'keyword.control.require:type:export',
+                    ctx('meta.export', 'keyword.control.as:from'),
+                    ctx('meta.export.default', 'keyword.control.default'),
+                    ctx('meta.import:import-equals', 'keyword.control.as:default:from:import'),
+                    'storage',
+                    ctx('meta.import:import-equals:export', 'punctuation.definition.block'),
+                ),
+            ),
+            rule(
+                { name: 'Operations', fg: c.operation },
+                any(
+                    'keyword.operator.type.asserts',
+                    'keyword.operator.expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
+                    'keyword.operator.new',
+                    'keyword.control.switch:conditional:trycatch:as:satisfies:loop',
+                    'storage.type.function.arrow',
+                    ctx('meta.type.parameters:declaration', 'storage.modifier'),
+                ),
+            ),
+            rule(
+                { name: 'Instructions', fg: c.instruction },
+                any('keyword.other.debugger', 'keyword.control.flow:with', 'keyword.operator.expression.delete'),
+            ),
+            rule({ name: 'Accessor', fg: c.fg.alpha(1 / 3) }, 'punctuation.accessor'),
+            rule({ name: 'Headings', fg: c.declaration }, 'markup.heading'),
+            rule({ name: 'Raw', fg: c.text }, any('markup.raw', 'markup.inline.raw')),
+            rule({ name: 'Quote', in: 'italic' }, 'markup.quote'),
+            rule({ name: 'Punctuations', in: [] }, 'punctuation'),
+            cross(
+                rule({ name: 'Italic', in: 'italic' }, 'markup.italic'),
+                rule({ name: 'Bold', in: 'bold' }, 'markup.bold'),
+            ),
+        ],
+        { defaultForeground: c.fg },
+    ),
+    type: 'dark',
     colors: {
         'activityBar.background': c.bg,
         'activityBar.foreground': c.fg,
@@ -149,103 +248,9 @@ const theme = {
         'titleBar.activeBackground': '#1e1f1c',
         'widget.shadow': '#00000098',
     },
-    semanticHighlighting: true,
-    semanticTokenColors: {
-        '*.deprecated': {
-            fontStyle: 'strikethrough',
-        },
-        comment: c.comment,
-        decorator: c.function,
-        enum: c.type,
-        //enumMember: c.fg,
-        //event: c.fg,
-        function: c.function,
-        interface: c.type,
-        keyword: c.instruction,
-        label: c.fg,
-        macro: c.function,
-        method: c.function,
-        namespace: c.type,
-        number: c.leaf,
-        operator: c.operation,
-        parameter: {
-            fontStyle: 'italic',
-            foreground: c.fg,
-        },
-        regexp: c.text,
-        string: c.text,
-        struct: c.type,
-        type: c.type,
-        typeParameter: {
-            fontStyle: 'italic',
-            foreground: c.type,
-        },
-        variable: c.fg,
-    },
-    tokenColors: compileTokenColors(
-        [
-            rule({ name: 'Illegal', fg: c.invalid, in: 'bold' }, 'invalid.illegal'),
-            rule({ name: 'Deprecated', in: 'strikethrough' }, 'invalid.deprecated'),
-            rule({ name: 'Comment', fg: c.comment }, 'comment'),
-            rule({ name: 'Documentation', fg: c.fg2_5 }, any('comment.block.documentation', 'comment.documentation')),
-            rule({ name: 'JSDoc', fg: c.fg2 }, 'storage.type.class.jsdoc'),
-            rule({ name: 'Constant', fg: c.leaf }, 'constant'),
-            rule({ name: 'Text', fg: c.text }, 'string'),
-            rule({ name: 'Language variables', fg: c.langvar, in: 'italic' }, any('variable.language', 'keyword.control.import')),
-            rule(
-                { name: 'Whites', fg: c.fg },
-                any(
-                    'punctuation.definition.template-expression',
-                    'punctuation.accessor.optional',
-                    'keyword.operator.type.annotation',
-                    'meta.brace',
-                    'meta.object-literal.key',
-                ),
-            ),
-            rule(
-                { name: 'Types', fg: c.type },
-                any('support.type', 'entity.name.type', 'keyword.type', 'punctuation.definition.typeparameters'),
-            ),
-            rule({ name: 'Functions', fg: c.function }, any('entity.name.function', 'meta.decorator')),
-            rule(
-                { name: 'Declarations', fg: c.declaration },
-                any(
-                    'keyword.control.require:type:export',
-                    ctx('meta.export', 'keyword.control.as:from'),
-                    ctx('meta.export.default', 'keyword.control.default'),
-                    ctx('meta.import:import-equals', 'keyword.control.as:default:from:import'),
-                    'storage',
-                    ctx('meta.import:import-equals:export', 'punctuation.definition.block'),
-                ),
-            ),
-            rule(
-                { name: 'Operations', fg: c.operation },
-                any(
-                    'keyword.operator.type.asserts',
-                    'keyword.operator.expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
-                    'keyword.operator.new',
-                    'keyword.control.switch:conditional:trycatch:as:satisfies:loop',
-                    'storage.type.function.arrow',
-                    ctx('meta.type.parameters:declaration', 'storage.modifier'),
-                ),
-            ),
-            rule(
-                { name: 'Instructions', fg: c.instruction },
-                any('keyword.other.debugger', 'keyword.control.flow:with', 'keyword.operator.expression.delete'),
-            ),
-            rule({ name: 'Accessor', fg: c.fg.alpha(1 / 3) }, 'punctuation.accessor'),
-            rule({ name: 'Headings', fg: c.declaration }, 'markup.heading'),
-            rule({ name: 'Raw', fg: c.text }, any('markup.raw', 'markup.inline.raw')),
-            rule({ name: 'Quote', in: 'italic' }, 'markup.quote'),
-            rule({ name: 'Punctuations', in: [] }, 'punctuation'),
-            cross(rule({ name: 'Italic', in: 'italic' }, 'markup.italic'), rule({ name: 'Bold', in: 'bold' }, 'markup.bold')),
-        ],
-        { defaultForeground: c.fg },
-    ),
-    type: 'dark',
 }
 
 writeFileSync(
     'themes/monokai-focus-color-theme.json',
-    JSON.stringify(theme, (_, v) => (v instanceof color ? (v.alpha() === 1 ? v.hex() : v.hexa()) : v), 2),
+    JSON.stringify(theme, (_, v) => (v instanceof color ? (v.alpha() === 1 ? v.hex() : v.hexa()) : v)),
 )
