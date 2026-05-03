@@ -20,6 +20,11 @@ export type TokenRule = {
     no?: Scope
 }
 
+export type RuleOptions = {
+    on: Scope
+    no?: Scope
+}
+
 export type CrossRule = {
     type: 'cross'
     rules: readonly TokenRule[]
@@ -58,8 +63,8 @@ export type TmSettings = {
 
 const fontStyleOrder: readonly FontStyle[] = ['bold', 'italic', 'strikethrough', 'underline']
 
-export function rule(style: Style, on: Scope, options: { no?: Scope } = {}): TokenRule {
-    return { type: 'rule', style, on, no: options.no }
+export function rule(style: Style, options: RuleOptions): TokenRule {
+    return { type: 'rule', style, on: options.on, no: options.no }
 }
 
 export function any(...parts: Scope[]): AnySelector {

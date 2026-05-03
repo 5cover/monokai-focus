@@ -10,7 +10,7 @@
     "Themes"
   ],
   "scripts": {
-    "build": "tsx color-theme.ts"
+    "build": "node color-theme.ts"
   },
   "type": "module",
   "contributes": {

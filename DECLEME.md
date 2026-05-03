@@ -43,13 +43,13 @@ type CompileOptions = {
 The default values are used when compiling `no` exclusions into reset rules.
 
 ```ts
-rule(style, on)
+rule(style, { on })
 ```
 
-Creates a binding between a style and one or more selectors.
+Creates a binding between a style and one or more selectors. `on` is required.
 
 ```ts
-rule(style, on, { no })
+rule(style, { on, no })
 ```
 
 Creates the same binding, then creates positive reset rules for excluded contexts.
@@ -197,8 +197,8 @@ Alternatives are flattened, sorted, and deduplicated within a compiled rule.
 
 ```ts
 cross(
-    rule({ name: 'Italic', in: 'italic' }, 'markup.italic'),
-    rule({ name: 'Bold', in: 'bold' }, 'markup.bold'),
+    rule({ name: 'Italic', in: 'italic' }, { on: 'markup.italic' }),
+    rule({ name: 'Bold', in: 'bold' }, { on: 'markup.bold' }),
 )
 ```
 
@@ -218,7 +218,8 @@ The merged rules use the merged style. For the example above, both combination s
 VS Code token-color entries do not have a native negative selector. `decleme` implements `no` by generating positive override rules.
 
 ```ts
-rule({ name: 'Text', fg: text }, 'string', {
+rule({ name: 'Text', fg: text }, {
+    on: 'string',
     no: 'meta.object-literal.key',
 })
 ```
@@ -249,7 +250,8 @@ compiles conceptually to:
 That makes the reset rule more specific than the original positive rule in the target selector grammar. When `on` already has parent scopes, the `no` selector is prepended as an outer context:
 
 ```ts
-rule(style, c('meta.import', 'keyword.control.as'), {
+rule(style, {
+    on: c('meta.import', 'keyword.control.as'),
     no: 'source.ts',
 })
 ```
