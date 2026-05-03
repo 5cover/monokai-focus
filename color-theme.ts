@@ -2,6 +2,7 @@ import nearestColor from 'nearest-color'
 import { colornames } from 'color-name-list'
 import color, { type ColorInstance } from 'color'
 import { writeFileSync } from 'fs'
+import { any, c as ctx, compileTokenColors, cross, rule } from './decleme'
 
 // nearestColor expects an object { name => hex }
 const colors = colornames.reduce((o, { name, hex }) => Object.assign(o, { [name]: hex }), {})
@@ -181,219 +182,70 @@ const theme = {
         },
         variable: c.fg,
     },
-    tokenColors: [
-        {
-            name: 'Illegal',
-            scope: 'invalid.illegal',
-            settings: {
-                fontStyle: 'bold',
-                foreground: c.invalid,
-            },
-        },
-        {
-            name: 'Deprecated',
-            scope: 'invalid.deprecated',
-            settings: {
-                fontStyle: 'strikethrough',
-            },
-        },
-        {
-            name: 'Comment',
-            scope: 'comment',
-            settings: {
-                foreground: c.comment,
-            },
-        },
-        {
-            name: 'Documentation',
-            scope: ['comment.block.documentation', 'comment.documentation'],
-            settings: {
-                foreground: c.fg2_5,
-            },
-        },
-        {
-            name: 'JSDoc',
-            scope: ['storage.type.class.jsdoc'],
-            settings: {
-                foreground: c.fg2,
-            },
-        },
-        {
-            name: 'Constant',
-            scope: ['constant'],
-            settings: {
-                foreground: c.leaf,
-            },
-        },
-        {
-            name: 'Text',
-            scope: ['string'],
-            settings: {
-                foreground: c.text,
-            },
-        },
-        {
-            name: 'Language variables',
-            scope: ['variable.language', 'keyword.control.import'],
-            settings: {
-                foreground: c.langvar,
-                fontStyle: 'italic',
-            },
-        },
-        {
-            name: 'Whites',
-            scope: [
-                'punctuation.definition.template-expression',
-                'punctuation.accessor.optional',
-                'keyword.operator.type.annotation',
-                'meta.brace',
-                'meta.object-literal.key',
-            ],
-            settings: {
-                foreground: c.fg,
-            },
-        },
-        {
-            name: 'Types',
-            scope: ['support.type', 'entity.name.type', 'keyword.type', 'punctuation.definition.typeparameters'],
-            settings: {
-                foreground: c.type,
-            },
-        },
-        {
-            name: 'Functions',
-            scope: ['entity.name.function', 'meta.decorator'],
-            settings: {
-                foreground: c.function,
-            },
-        },
-        {
-            name: 'Declarations',
-            scope: [
-                'keyword.control.require',
-                'keyword.control.type',
-                'keyword.control.export',
-                'meta.export keyword.control.as',
-                'meta.export keyword.control.from',
-                'meta.export.default keyword.control.default',
-                'meta.import keyword.control.as',
-                'meta.import keyword.control.default',
-                'meta.import keyword.control.from',
-                'meta.import keyword.control.import',
-                'meta.import-equals keyword.control.as',
-                'meta.import-equals keyword.control.default',
-                'meta.import-equals keyword.control.from',
-                'meta.import-equals keyword.control.import',
-                'storage',
-                'meta.import punctuation.definition.block',
-                'meta.import-equals punctuation.definition.block',
-                'meta.export punctuation.definition.block',
-            ],
-            settings: {
-                foreground: c.declaration,
-            },
-        },
-        {
-            name: 'Operations',
-            scope: [
-                'keyword.operator.type.asserts',
-                'keyword.operator.expression.typeof',
-                'keyword.operator.expression.in',
-                'keyword.operator.expression.instanceof',
-                'keyword.operator.new',
-                'keyword.operator.expression.void',
-                'keyword.control.switch',
-                'keyword.control.conditional',
-                'keyword.control.trycatch',
-                'keyword.control.loop',
-                'keyword.operator.expression.of',
-                'storage.type.function.arrow',
-                'keyword.operator.expression.keyof',
-                'keyword.control.as',
-                'keyword.operator.expression.as',
-                'keyword.operator.expression.infer',
-                'keyword.control.satisfies',
-                'keyword.operator.expression.is',
-                'meta.type.parameters storage.modifier',
-                'meta.type.declaration storage.modifier',
-            ],
-            settings: {
-                foreground: c.operation,
-            },
-        },
-        {
-            name: 'Instructions',
-            scope: [
-                'keyword.other.debugger',
-                'keyword.control.flow',
-                'keyword.control.with',
-                'keyword.operator.expression.delete',
-            ],
-            settings: {
-                foreground: c.instruction,
-            },
-        },
-        {
-            name: 'Accessor',
-            scope: 'punctuation.accessor',
-            settings: {
-                foreground: c.fg.alpha(1 / 3),
-            },
-        },
-        {
-            name: 'Headings',
-            scope: 'markup.heading',
-            settings: {
-                foreground: c.declaration,
-            },
-        },
-        {
-            name: 'Raw',
-            scope: ['markup.raw', 'markup.inline.raw'],
-            settings: {
-                foreground: c.text,
-            },
-        },
-        {
-            name: 'Quote',
-            scope: 'markup.quote',
-            settings: {
-                fontStyle: 'italic',
-            },
-        },
-        {
-            name: 'Punctuations',
-            scope: 'punctuation',
-            settings: {
-                fontStyle: '',
-            },
-        },
-        {
-            name: 'Italic',
-            scope: 'markup.italic',
-            settings: {
-                fontStyle: 'italic',
-            },
-        },
-        {
-            name: 'Bold',
-            scope: 'markup.bold',
-            settings: {
-                fontStyle: 'bold',
-            },
-        },
-        {
-            name: 'Italic&Bold',
-            scope: ['markup.italic markup.bold', 'markup.bold markup.italic'],
-            settings: {
-                fontStyle: 'bold italic',
-            },
-        },
-    ],
+    tokenColors: compileTokenColors(
+        [
+            rule({ name: 'Illegal', fg: c.invalid, in: 'bold' }, 'invalid.illegal'),
+            rule({ name: 'Deprecated', in: 'strikethrough' }, 'invalid.deprecated'),
+            rule({ name: 'Comment', fg: c.comment }, 'comment'),
+            rule({ name: 'Documentation', fg: c.fg2_5 }, any('comment.block.documentation', 'comment.documentation')),
+            rule({ name: 'JSDoc', fg: c.fg2 }, 'storage.type.class.jsdoc'),
+            rule({ name: 'Constant', fg: c.leaf }, 'constant'),
+            rule({ name: 'Text', fg: c.text }, 'string'),
+            rule({ name: 'Language variables', fg: c.langvar, in: 'italic' }, any('variable.language', 'keyword.control.import')),
+            rule(
+                { name: 'Whites', fg: c.fg },
+                any(
+                    'punctuation.definition.template-expression',
+                    'punctuation.accessor.optional',
+                    'keyword.operator.type.annotation',
+                    'meta.brace',
+                    'meta.object-literal.key',
+                ),
+            ),
+            rule(
+                { name: 'Types', fg: c.type },
+                any('support.type', 'entity.name.type', 'keyword.type', 'punctuation.definition.typeparameters'),
+            ),
+            rule({ name: 'Functions', fg: c.function }, any('entity.name.function', 'meta.decorator')),
+            rule(
+                { name: 'Declarations', fg: c.declaration },
+                any(
+                    'keyword.control.require:type:export',
+                    ctx('meta.export', 'keyword.control.as:from'),
+                    ctx('meta.export.default', 'keyword.control.default'),
+                    ctx('meta.import:import-equals', 'keyword.control.as:default:from:import'),
+                    'storage',
+                    ctx('meta.import:import-equals:export', 'punctuation.definition.block'),
+                ),
+            ),
+            rule(
+                { name: 'Operations', fg: c.operation },
+                any(
+                    'keyword.operator.type.asserts',
+                    'keyword.operator.expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
+                    'keyword.operator.new',
+                    'keyword.control.switch:conditional:trycatch:as:satisfies:loop',
+                    'storage.type.function.arrow',
+                    ctx('meta.type.parameters:declaration', 'storage.modifier'),
+                ),
+            ),
+            rule(
+                { name: 'Instructions', fg: c.instruction },
+                any('keyword.other.debugger', 'keyword.control.flow:with', 'keyword.operator.expression.delete'),
+            ),
+            rule({ name: 'Accessor', fg: c.fg.alpha(1 / 3) }, 'punctuation.accessor'),
+            rule({ name: 'Headings', fg: c.declaration }, 'markup.heading'),
+            rule({ name: 'Raw', fg: c.text }, any('markup.raw', 'markup.inline.raw')),
+            rule({ name: 'Quote', in: 'italic' }, 'markup.quote'),
+            rule({ name: 'Punctuations', in: [] }, 'punctuation'),
+            cross(rule({ name: 'Italic', in: 'italic' }, 'markup.italic'), rule({ name: 'Bold', in: 'bold' }, 'markup.bold')),
+        ],
+        { defaultForeground: c.fg },
+    ),
     type: 'dark',
 }
 
 writeFileSync(
     'themes/monokai-focus-color-theme.json',
-    JSON.stringify(theme, (_, v) => (v instanceof color ? v.hexa() : v)),
+    JSON.stringify(theme, (_, v) => (v instanceof color ? (v.alpha() === 1 ? v.hex() : v.hexa()) : v), 2),
 )
