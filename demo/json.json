@@ -1,8 +1,8 @@
 {
   "env": {
     "es6": true,
-    "mocha": true,
-    "node": true
+    "mocha": false,
+    "node": null
   },
   "extends": "eslint:recommended",
   "rules": {

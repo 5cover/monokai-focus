@@ -26,6 +26,6 @@ class App extends React.Component {
         <ButtonPanel clickHandler={this.handleClick} />
       </div>
     )
-  }
+  } 
 }
 export default App

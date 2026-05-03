@@ -9,11 +9,17 @@
     "strictFunctionTypes": true,
     "strict": true,
     "allowSyntheticDefaultImports": true,
+    "verbatimModuleSyntax": true,
     "types": [
       "node"
     ]
   },
+  "include": [
+    "scripts/**/*.ts",
+    "src/**/*.ts"
+  ],
   "exclude": [
+    "demo",
     "node_modules",
     "**/node_modules/*"
   ]
