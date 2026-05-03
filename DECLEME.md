@@ -220,7 +220,7 @@ VS Code token-color entries do not have a native negative selector. `decleme` im
 ```ts
 rule({ name: 'Text', fg: text }, {
     on: 'string',
-    no: 'meta.object-literal.key',
+    no: 'meta.object-literal.key string',
 })
 ```
 
@@ -235,32 +235,13 @@ compiles conceptually to:
     },
     {
         name: 'Text reset',
-        scope: 'meta.object-literal.key string',
+        scope: 'string meta.object-literal.key',
         settings: { foreground: defaultForeground },
     },
 ]
 ```
 
-`no` is an excluded context selector. For every expanded `on` selector and every expanded `no` selector, decleme emits:
-
-```text
-<no selector> <on selector>
-```
-
-That makes the reset rule more specific than the original positive rule in the target selector grammar. When `on` already has parent scopes, the `no` selector is prepended as an outer context:
-
-```ts
-rule(style, {
-    on: c('meta.import', 'keyword.control.as'),
-    no: 'source.ts',
-})
-```
-
-emits a reset selector shaped like:
-
-```text
-source.ts meta.import keyword.control.as
-```
+`no` is an excluded context selector.
 
 The reset style is the inverse of the fields present in the original style:
 

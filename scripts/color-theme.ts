@@ -3,6 +3,7 @@ import { colornames } from 'color-name-list'
 import color, { type ColorInstance } from 'color'
 import { writeFileSync } from 'fs'
 import { any, c, compileTokenColors, cross, r } from './decleme.ts'
+import { join } from 'path'
 
 // nearestColor expects an object { name => hex }
 const nearest = (() => {
@@ -15,9 +16,9 @@ const core = {
     green: color('hsl(90, 59%, 66%)'),
     blue: color('hsl(186, 51%, 69%)'),
     purple: color('hsl(250, 77%, 78%)'),
-    red: color('hsl(5, 90%, 72%)'),
-    orange: color('hsl(20, 96%, 70%)'),
-    yellow: color('hsl(45, 86%, 70%)'),
+    red: color('hsl(5, 80%, 75%)'),
+    orange: color('hsl(30, 96%, 70%)'),
+    yellow: color('hsl(45, 80%, 70%)'),
     pink: color('hsl(313, 42%, 80%)'),
 }
 
@@ -69,6 +70,7 @@ const theme = {
         operator: colors.operation,
         parameter: {
             fontStyle: 'italic',
+            foreground: colors.fg,
         },
         regexp: colors.text,
         string: colors.text,
@@ -78,18 +80,19 @@ const theme = {
             fontStyle: 'italic',
             foreground: colors.type,
         },
-        variable: colors.mutable,
-        '*.readonly': colors.fg,
+        '*.modification': {
+            fontStyle: 'italic',
+        },
+        '*.typeHint': {
+            foreground: colors.type,
+        },
     },
     tokenColors: compileTokenColors(
         [
             r({ name: 'illegal', fg: colors.invalid, in: 'bold' }, { on: 'invalid.illegal' }),
             r({ name: 'deprecated', in: 'strikethrough' }, { on: 'invalid.deprecated' }),
             r({ name: 'comment', fg: colors.comment }, { on: 'comment' }),
-            r(
-                { name: 'documentation', fg: colors.fg2_5 },
-                { on: any('comment.block.documentation', 'comment.documentation') },
-            ),
+            r({ name: 'documentation', fg: colors.fg2_5 }, { on: 'comment.:block.documentation' }),
             r({ name: 'documentation syntax', fg: colors.fg2 }, { on: 'storage.type.class.jsdoc' }),
             r({ name: 'constant', fg: colors.leaf }, { on: 'constant' }),
             r(
@@ -103,19 +106,40 @@ const theme = {
                 },
             ),
             r(
+                { name: 'component', fg: colors.function },
+                {
+                    on: 'support.class.component',
+                },
+            ),
+            r(
+                { name: 'tag', fg: colors.leaf },
+                {
+                    on: 'entity.name.tag',
+                },
+            ),
+            r(
+                {
+                    name: 'attribute',
+                    fg: colors.operation,
+                },
+                {
+                    on: 'entity.other.attribute-name',
+                },
+            ),
+            r(
                 { name: 'language variable', fg: colors.langvar, in: 'italic' },
                 { on: any('variable.language', 'keyword.control.import') },
             ),
+            r({ name: 'at-rule', fg: colors.instruction }, { on: 'keyword.control.at-rule' }),
             r(
                 { name: 'type', fg: colors.type },
                 {
                     on: any(
-                        'support.type',
-                        'entity.name.type',
-                        'keyword.type',
+                        [any('support', 'keyword', 'entity.name'), 'type'],
                         'punctuation.definition.typeparameters',
-                        'storage.modifier.pointer'
+                        'storage.modifier.pointer',
                     ),
+                    no: 'support.type.property-name',
                 },
             ),
             r({ name: 'function', fg: colors.function }, { on: any('entity.name.function', 'meta.decorator') }),
@@ -124,24 +148,40 @@ const theme = {
                 {
                     on: any(
                         'constant.language.import-export-all',
-                        'keyword.control.require:type:export',
-                        c('meta.export', 'keyword.control.as:from'),
-                        c('meta.export.default', ['keyword', any('control.default', 'operator.assignment')]),
-                        c('meta.import:import-equals', 'keyword.control.as:default:from:import'),
+                        ['keyword', any('other.typedef', 'control.require:type:export')],
+                        [
+                            'meta',
+                            any(
+                                c('export', 'keyword.control.as:from'),
+                                c('export.default', ['keyword', 'control.default']),
+                                c(
+                                    'import:import-equals',
+                                    any('keyword.control.as:default:from:import', 'punctuation.definition.block'),
+                                ),
+                            ),
+                        ],
                         'storage.type:modifier',
-                        c('meta.import:import-equals:export', 'punctuation.definition.block'),
-                        'punctuation.section.angle-brackets'
+                        'punctuation.section.angle-brackets',
                     ),
+                    no: 'storage.type.function.arrow',
                 },
             ),
             r(
                 { name: 'operation', fg: colors.operation },
                 {
                     on: any(
-                        'keyword.operator.type.asserts',
-                        'keyword.operator.expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
-                        'keyword.operator.new',
-                        'keyword.control.switch:conditional:trycatch:as:satisfies:loop:if',
+                        [
+                            'keyword',
+                            any('control.switch:conditional:trycatch:as:satisfies:loop:if', [
+                                'operator',
+                                any(
+                                    'type.asserts',
+                                    'expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
+                                    'new',
+                                    'logical',
+                                ),
+                            ]),
+                        ],
                         c('meta.type.parameters:declaration', 'storage.modifier'),
                     ),
                 },
@@ -149,15 +189,11 @@ const theme = {
             r(
                 { name: 'instruction', fg: colors.instruction },
                 {
-                    on: any(
-                        'keyword.other.debugger',
-                        'keyword.control.flow:with:return',
-                        'keyword.operator.expression.delete',
-                    ),
+                    on: ['keyword', any('other.debugger', 'control.flow:with:return', 'operator.expression.delete')],
                 },
             ),
             r(
-                { name: 'accessor', fg: colors.fg.alpha(1 / 3) },
+                { name: 'accessor', fg: colors.fg.alpha(1 / 4) },
                 { on: 'punctuation.accessor', no: 'punctuation.accessor.optional' },
             ),
             r({ name: 'raw', fg: colors.text }, { on: any('markup.raw', 'markup.inline.raw') }),
@@ -168,7 +204,8 @@ const theme = {
                 r({ name: 'heading', fg: colors.declaration }, { on: 'markup.heading' }),
             ),
             r({ name: 'section', fg: colors.declaration }, { on: 'entity.name.section' }),
-            r({ name: 'preprocessor', fg: colors.type }, { on: 'keyword.control.directive' })
+            r({ name: 'preprocessor', fg: colors.type }, { on: 'keyword.control.directive' }),
+            r({ name: 'list', fg: colors.type }, { on: 'punctuation.definition.list' }),
         ],
         { defaultForeground: colors.fg },
     ),
@@ -191,10 +228,10 @@ const theme = {
         'editor.selectionHighlightBackground': '#575b6180',
         'editor.wordHighlightBackground': '#4a4a7680',
         'editor.wordHighlightStrongBackground': '#6a6a9680',
-        //'editorBracketHighlight.foreground1': c.fg,
-        //'editorBracketHighlight.foreground2': c.fg1,
-        //'editorBracketHighlight.foreground3': c.fg2,
-        //'editorBracketHighlight.foreground4': c.fg1,
+        'editorBracketHighlight.foreground1': colors.fg,
+        'editorBracketHighlight.foreground2': colors.fg1,
+        'editorBracketHighlight.foreground3': colors.fg2,
+        'editorBracketHighlight.foreground4': colors.fg1,
         'editorBracketHighlight.unexpectedBracket.foreground': colors.invalid,
         'editorCursor.foreground': '#f8f8f0',
         'editorGroup.border': '#34352f',
@@ -276,6 +313,12 @@ const theme = {
 }
 
 writeFileSync(
-    'themes/monokai-focus-color-theme.json',
-    JSON.stringify(theme, (_, v) => (v instanceof color ? (v.alpha() === 1 ? v.hex() : v.hexa()) : v)),
+    join(import.meta.dirname, '../themes/monokai-focus-color-theme.json'),
+    JSON.stringify(theme, (_, v) =>
+        v instanceof color ?
+            v.alpha() === 1 ?
+                v.hex()
+            :   v.hexa()
+        :   v,
+    ),
 )

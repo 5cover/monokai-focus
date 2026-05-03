@@ -263,80 +263,23 @@ syntax
     throw
     with
 
-## proposed color scheme
+## additionnal features
 
-- parameters: italics
-
-(closest color name after the colon)
-
-- hsl(70, 8%, 14%): Burgundy
-  - background
-- hsl(60, 30%, 96%): White Smoke
-  - identifiers
-  - punctuation
-- hsl(339, 80%, 82%): Shell pink
-  - language provided bindings
-- hsl(250, 77%, 78%): Lilac
-  - functions
-- hsl(20, 96%, 70%): Apricot
-  - comments
-- hsl(60, 1%, 53%): Gray
-  - documentation
-- hsl(138, 53%, 66%): Celadon Green
-  - types
-- hsl(50, 100%, 70%): Honey Orange
-  - text
-- hsl(30, 54%, 61%): Sand Brown
-  - leaves
-  - escape sequences
-- hsl(144, 61%, 73%)en
-  - operations
-- hsl(200, 71%, 69%): Sky Blue
-  - declarations
-- hsl(345, 90%, 69%): Light Coral
-  - instructions
-- #f53d3d: Persimmon
-  - invalid
-- hsl(60, 30%, 96%): White Smoke, hsl(60, 4%, 75%): Silver, hsl(60, 1%, 59%): Rosy Brown
-  - bracket pairs
-
-grays lightness = $X/phi^(N/2)$ from base white
-docs: 96/phi^(5/4)
-
-## ideas
-
-### have brackets inherit the style of what they are used on
+### brackets inherit the style of what they are used on
 
     f(args) // () use f's color
     import { x } from 'module' // {} use import's color
 
-like brackets are used to extend something
-those are different brackets then standalone brackets (like expression groupings ,array and objects) because they cannot be nested. so they should be colored differently while we can keep our lightness scaling for nested standalone brackets
+Like brackets are used to extend something
+Tthose are different brackets then standalone brackets (like expression groupings ,array and objects) because they cannot be nested. so they should be colored differently while we can keep our lightness scaling for nested standalone brackets
+This can be partially done on VSCode assuming bracket pair colorization is disabled, but it is brittle.
 
 ## cannot do
 
-what doesn't seem to be doable with native syntax highlighting tools.
+what doesn't seem to be doable with native VSCode syntax highlighting.
 
 - structural bracket coloring
 - only increase bracket pair depth for contiguous brackets
 - catch variable in italics
 - color only expression-level commas as separators
-- coloring break and continue, goto, and for await as instructions (keyword.control.loop everywhere)
-
-monokai pro colors
-
-- hsl(285, 5%, 17%)
-- hsl(60, 25%, 98%)
-- hsl(20, 96%, 70%) : comment
-- hsl(45, 100%, 70%) : text
-- hsl(90, 59%, 66%) : type, leaf
-- hsl(186, 71%, 69%) : declaration, operation
-- hsl(250, 77%, 78%) : function
-- hsl(345, 100%, 69%) : instruction
-- hsl(0, 1%, 76%)
-- hsl(300, 1%, 57%)
-- hsl(300, 1%, 44%)
-- hsl(280, 2%, 36%)
-- hsl(280, 2%, 25%)
-- hsl(300, 5%, 13%)
-- hsl(270, 4%, 10%)
+- coloring break and continue, goto, and for await as instructions (keyword.control.loop everywhere for JS/TS)

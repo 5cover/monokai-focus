@@ -10,7 +10,7 @@
     "Themes"
   ],
   "scripts": {
-    "build": "node color-theme.ts"
+    "build": "node scripts/color-theme.ts"
   },
   "type": "module",
   "contributes": {

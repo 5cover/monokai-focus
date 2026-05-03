@@ -61,8 +61,6 @@ export type TmSettings = {
     lineHeight?: number
 }
 
-const fontStyleOrder: readonly FontStyle[] = ['bold', 'italic', 'strikethrough', 'underline']
-
 export function r(style: Style, options: RuleOptions): TokenRule {
     return { type: 'rule', style, on: options.on, no: options.no }
 }
@@ -126,7 +124,7 @@ function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] 
 
 function combinedName(rules: readonly TokenRule[]): Pick<Style, 'name'> {
     const names = rules.flatMap(item => (item.style.name ? [item.style.name] : []))
-    return names.length > 0 ? { name: names.join('&') } : {}
+    return names.length > 0 ? { name: names.sort().join(' ') } : {}
 }
 
 function toTokenColor(style: Style, scopes: readonly string[]): TmTokenColor {
@@ -149,10 +147,7 @@ function toSettings(style: Style): TmSettings {
 
 function normalizeFontStyle(value: Style['in']): string {
     if (value === undefined) return ''
-    const items = toFontStyleArray(value)
-    if (items.length === 0) return ''
-    const styles = new Set(items)
-    return fontStyleOrder.filter(style => styles.has(style)).join(' ')
+    return uniqueSorted(toFontStyleArray(value)).join(' ')
 }
 
 function invertStyle(style: Style, options: CompileOptions): Style {
@@ -180,7 +175,7 @@ function mergeStyles(left: Style, right: Style): Style {
         if (rightItems && rightItems.length === 0) {
             merged.in = []
         } else {
-            merged.in = uniqueFontStyles([...('in' in left ? toFontStyleArray(left.in) : []), ...(rightItems ?? [])])
+            merged.in = [...('in' in left ? toFontStyleArray(left.in) : []), ...(rightItems ?? [])]
         }
     }
 
@@ -190,11 +185,6 @@ function mergeStyles(left: Style, right: Style): Style {
 function toFontStyleArray(value: Style['in']): FontStyle[] {
     if (value === undefined) return []
     return typeof value === 'string' ? [value] : [...value]
-}
-
-function uniqueFontStyles(items: readonly FontStyle[]): FontStyle[] {
-    const styles = new Set(items)
-    return fontStyleOrder.filter(style => styles.has(style))
 }
 
 function expandScope(scope: Scope): string[] {
@@ -234,5 +224,5 @@ function permutations<T>(items: readonly T[]): T[][] {
 }
 
 function uniqueSorted(items: readonly string[]): string[] {
-    return [...new Set(items)].sort((left, right) => left.localeCompare(right))
+    return [...new Set(items)].sort()
 }
