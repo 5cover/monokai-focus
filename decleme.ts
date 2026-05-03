@@ -63,7 +63,7 @@ export type TmSettings = {
 
 const fontStyleOrder: readonly FontStyle[] = ['bold', 'italic', 'strikethrough', 'underline']
 
-export function rule(style: Style, options: RuleOptions): TokenRule {
+export function r(style: Style, options: RuleOptions): TokenRule {
     return { type: 'rule', style, on: options.on, no: options.no }
 }
 
@@ -94,9 +94,7 @@ function compileTokenRule(item: TokenRule, options: CompileOptions): TmTokenColo
 
     if (item.no) {
         const resetStyle = invertStyle(item.style, options)
-        const resetScopes = uniqueSorted(
-            expandScope(item.no).flatMap(excluded => scopes.map(scope => `${excluded} ${scope}`)),
-        )
+        const resetScopes = uniqueSorted(expandScope(item.no))
         compiled.push(toTokenColor({ ...resetStyle, name: `${item.style.name ?? 'Rule'} reset` }, resetScopes))
     }
 

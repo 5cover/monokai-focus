@@ -6,7 +6,7 @@ This theme is a principled fork of Monokai that keeps background colors and gene
 
 Monokai is fine, but as I started according more attention to the actual color and styles, I realized how much signal my brain has to throws away and ignore when reading the code. Clutter. Visual noise. This theme aims to minimize it.
 
-1. Minimize the number of distinct colors displayed in an unit of code
+1. Minimize color churn: the number of times the foreground color changes in construct.
 2. Color only what is unambiguous, rest stays white (fg). This means symbolic operators are fg in a language where they are already syntactically distinct from everything else.
 3. Use semantically meaningful colors.
 

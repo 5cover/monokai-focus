@@ -2,31 +2,33 @@ import nearestColor from 'nearest-color'
 import { colornames } from 'color-name-list'
 import color, { type ColorInstance } from 'color'
 import { writeFileSync } from 'fs'
-import { any, c as ctx, compileTokenColors, cross, rule } from './decleme.ts'
+import { any, c, compileTokenColors, cross, r } from './decleme.ts'
 
 // nearestColor expects an object { name => hex }
-const colors = colornames.reduce((o, { name, hex }) => Object.assign(o, { [name]: hex }), {})
-const _nearest = nearestColor.from(colors)
-const nearest = (c: ColorInstance) => _nearest(c.hex())
+const nearest = (() => {
+    const colors = colornames.reduce((o, { name, hex }) => Object.assign(o, { [name]: hex }), {})
+    const n = nearestColor.from(colors)
+    return (c: ColorInstance) => n(c.hex())
+})()
 
 const core = {
     green: color('hsl(90, 59%, 66%)'),
     blue: color('hsl(186, 51%, 69%)'),
     purple: color('hsl(250, 77%, 78%)'),
     red: color('hsl(5, 90%, 72%)'),
+    orange: color('hsl(20, 96%, 70%)'),
     yellow: color('hsl(45, 86%, 70%)'),
+    pink: color('hsl(313, 42%, 80%)'),
 }
 
-//color('hsl(315, 53%, 80%)')
-
-const c = {
+const colors = {
     invalid: color('hsl(0, 90%, 60%)'),
     bg: color('#272822'),
     fg: color('hsl(60, 30%, 96%)'),
     fg1: color('hsl(60, 4%, 75%)'),
     fg2: color('hsl(60, 1%, 59%)'),
     fg2_5: color('hsl(60, 1%, 53%)'),
-    comment: color('hsl(20, 96%, 70%)'),
+    comment: core.orange,
     text: core.yellow,
     operation: core.blue,
     type: core.green,
@@ -35,14 +37,15 @@ const c = {
     function: core.purple,
     langvar: core.red,
     instruction: core.red,
+    mutable: core.pink,
 }
 
 console.table(
-    Object.entries(c).map(([k, cl]) => ({
+    Object.entries(colors).map(([k, cl]) => ({
         k,
         hex: cl.hex(),
         hsl: cl.hsl().string(),
-        contrast: cl.contrast(c.bg).toPrecision(3),
+        contrast: cl.contrast(colors.bg).toPrecision(3),
         name: nearest(cl)?.name,
     })),
 )
@@ -53,136 +56,136 @@ const theme = {
         '*.deprecated': {
             fontStyle: 'strikethrough',
         },
-        comment: c.comment,
-        decorator: c.function,
-        enum: c.type,
-        //enumMember: c.fg,
-        //event: c.fg,
-        function: c.function,
-        interface: c.type,
-        keyword: c.instruction,
-        label: c.fg,
-        macro: c.function,
-        method: c.function,
-        namespace: c.type,
-        number: c.leaf,
-        operator: c.operation,
+        comment: colors.comment,
+        decorator: colors.function,
+        enum: colors.type,
+        function: colors.function,
+        interface: colors.type,
+        keyword: colors.instruction,
+        macro: colors.function,
+        method: colors.function,
+        namespace: colors.type,
+        number: colors.leaf,
+        operator: colors.operation,
         parameter: {
             fontStyle: 'italic',
-            foreground: c.fg,
         },
-        regexp: c.text,
-        string: c.text,
-        struct: c.type,
-        type: c.type,
+        regexp: colors.text,
+        string: colors.text,
+        struct: colors.type,
+        type: colors.type,
         typeParameter: {
             fontStyle: 'italic',
-            foreground: c.type,
+            foreground: colors.type,
         },
-        variable: c.fg,
+        variable: colors.mutable,
+        '*.readonly': colors.fg,
     },
     tokenColors: compileTokenColors(
         [
-            rule({ name: 'Illegal', fg: c.invalid, in: 'bold' }, { on: 'invalid.illegal' }),
-            rule({ name: 'Deprecated', in: 'strikethrough' }, { on: 'invalid.deprecated' }),
-            rule({ name: 'Comment', fg: c.comment }, { on: 'comment' }),
-            rule(
-                { name: 'Documentation', fg: c.fg2_5 },
+            r({ name: 'illegal', fg: colors.invalid, in: 'bold' }, { on: 'invalid.illegal' }),
+            r({ name: 'deprecated', in: 'strikethrough' }, { on: 'invalid.deprecated' }),
+            r({ name: 'comment', fg: colors.comment }, { on: 'comment' }),
+            r(
+                { name: 'documentation', fg: colors.fg2_5 },
                 { on: any('comment.block.documentation', 'comment.documentation') },
             ),
-            rule({ name: 'Documentation syntax', fg: c.fg2 }, { on: 'storage.type.class.jsdoc' }),
-            rule({ name: 'Constant', fg: c.leaf }, { on: 'constant' }),
-            rule({ name: 'Text', fg: c.text }, { on: 'string' }),
-            rule(
-                { name: 'Language variables', fg: c.langvar, in: 'italic' },
-                { on: any('variable.language', 'keyword.control.import') },
-            ),
-            rule(
-                { name: 'Whites', fg: c.fg },
+            r({ name: 'documentation syntax', fg: colors.fg2 }, { on: 'storage.type.class.jsdoc' }),
+            r({ name: 'constant', fg: colors.leaf }, { on: 'constant' }),
+            r(
+                { name: 'text', fg: colors.text },
                 {
-                    on: any(
-                        'punctuation.definition.template-expression',
-                        'punctuation.accessor.optional',
-                        'keyword.operator.type.annotation',
-                        'meta.brace',
-                        'meta.object-literal.key',
+                    on: 'string',
+                    no: any(
+                        c('meta.object-literal.key', 'string'),
+                        c('string', any('punctuation.definition.template-expression', 'meta.template.expression')),
                     ),
                 },
             ),
-            rule(
-                { name: 'Types', fg: c.type },
+            r(
+                { name: 'language variable', fg: colors.langvar, in: 'italic' },
+                { on: any('variable.language', 'keyword.control.import') },
+            ),
+            r(
+                { name: 'type', fg: colors.type },
                 {
                     on: any(
                         'support.type',
                         'entity.name.type',
                         'keyword.type',
                         'punctuation.definition.typeparameters',
+                        'storage.modifier.pointer'
                     ),
                 },
             ),
-            rule({ name: 'Functions', fg: c.function }, { on: any('entity.name.function', 'meta.decorator') }),
-            rule(
-                { name: 'Declarations', fg: c.declaration },
+            r({ name: 'function', fg: colors.function }, { on: any('entity.name.function', 'meta.decorator') }),
+            r(
+                { name: 'declaration', fg: colors.declaration },
                 {
                     on: any(
+                        'constant.language.import-export-all',
                         'keyword.control.require:type:export',
-                        ctx('meta.export', 'keyword.control.as:from'),
-                        ctx('meta.export.default', 'keyword.control.default'),
-                        ctx('meta.import:import-equals', 'keyword.control.as:default:from:import'),
-                        'storage',
-                        ctx('meta.import:import-equals:export', 'punctuation.definition.block'),
+                        c('meta.export', 'keyword.control.as:from'),
+                        c('meta.export.default', ['keyword', any('control.default', 'operator.assignment')]),
+                        c('meta.import:import-equals', 'keyword.control.as:default:from:import'),
+                        'storage.type:modifier',
+                        c('meta.import:import-equals:export', 'punctuation.definition.block'),
+                        'punctuation.section.angle-brackets'
                     ),
                 },
             ),
-            rule(
-                { name: 'Operations', fg: c.operation },
+            r(
+                { name: 'operation', fg: colors.operation },
                 {
                     on: any(
                         'keyword.operator.type.asserts',
                         'keyword.operator.expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
                         'keyword.operator.new',
-                        'keyword.control.switch:conditional:trycatch:as:satisfies:loop',
-                        'storage.type.function.arrow',
-                        ctx('meta.type.parameters:declaration', 'storage.modifier'),
+                        'keyword.control.switch:conditional:trycatch:as:satisfies:loop:if',
+                        c('meta.type.parameters:declaration', 'storage.modifier'),
                     ),
                 },
             ),
-            rule(
-                { name: 'Instructions', fg: c.instruction },
+            r(
+                { name: 'instruction', fg: colors.instruction },
                 {
                     on: any(
                         'keyword.other.debugger',
-                        'keyword.control.flow:with',
+                        'keyword.control.flow:with:return',
                         'keyword.operator.expression.delete',
                     ),
                 },
             ),
-            rule({ name: 'Accessor', fg: c.fg.alpha(1 / 3) }, { on: 'punctuation.accessor' }),
-            rule({ name: 'Headings', fg: c.declaration }, { on: 'markup.heading' }),
-            rule({ name: 'Raw', fg: c.text }, { on: any('markup.raw', 'markup.inline.raw') }),
-            rule({ name: 'Quote', in: 'italic' }, { on: 'markup.quote' }),
-            rule({ name: 'Punctuations', in: [] }, { on: 'punctuation' }),
-            cross(
-                rule({ name: 'Italic', in: 'italic' }, { on: 'markup.italic' }),
-                rule({ name: 'Bold', in: 'bold' }, { on: 'markup.bold' }),
+            r(
+                { name: 'accessor', fg: colors.fg.alpha(1 / 3) },
+                { on: 'punctuation.accessor', no: 'punctuation.accessor.optional' },
             ),
+            r({ name: 'raw', fg: colors.text }, { on: any('markup.raw', 'markup.inline.raw') }),
+            cross(
+                r({ name: 'italic', in: 'italic' }, { on: 'markup.italic' }),
+                r({ name: 'bold', in: 'bold' }, { on: 'markup.bold' }),
+                r({ name: 'quote', in: 'italic' }, { on: 'markup.quote' }),
+                r({ name: 'heading', fg: colors.declaration }, { on: 'markup.heading' }),
+            ),
+            r({ name: 'section', fg: colors.declaration }, { on: 'entity.name.section' }),
+            r({ name: 'preprocessor', fg: colors.type }, { on: 'keyword.control.directive' })
         ],
-        { defaultForeground: c.fg },
+        { defaultForeground: colors.fg },
     ),
     type: 'dark',
     colors: {
-        'activityBar.background': c.bg,
-        'activityBar.foreground': c.fg,
+        'activityBar.background': colors.bg,
+        'activityBar.foreground': colors.fg,
         'badge.background': '#75715E',
-        'badge.foreground': c.fg,
+        'badge.foreground': colors.fg,
         'button.background': '#75715E',
         'debugToolBar.background': '#1e1f1c',
         'diffEditor.insertedTextBackground': '#4b661680', // middle of #272822 and #a6e22e
         'diffEditor.removedTextBackground': '#90274A70', // middle of #272822 and #f92672
         'dropdown.background': '#414339',
         'dropdown.listBackground': '#1e1f1c',
-        'editor.background': c.bg,
-        'editor.foreground': c.fg,
+        'editor.background': colors.bg,
+        'editor.foreground': colors.fg,
         'editor.lineHighlightBackground': '#3e3d32',
         'editor.selectionBackground': '#878b9180',
         'editor.selectionHighlightBackground': '#575b6180',
@@ -192,7 +195,7 @@ const theme = {
         //'editorBracketHighlight.foreground2': c.fg1,
         //'editorBracketHighlight.foreground3': c.fg2,
         //'editorBracketHighlight.foreground4': c.fg1,
-        'editorBracketHighlight.unexpectedBracket.foreground': c.invalid,
+        'editorBracketHighlight.unexpectedBracket.foreground': colors.invalid,
         'editorCursor.foreground': '#f8f8f0',
         'editorGroup.border': '#34352f',
         'editorGroup.dropBackground': '#41433980',
@@ -203,7 +206,7 @@ const theme = {
         'editorIndentGuide.background1': '#464741',
         'editorLineNumber.activeForeground': '#c2c2bf',
         'editorLineNumber.foreground': '#90908a',
-        'editorSuggestWidget.background': c.bg,
+        'editorSuggestWidget.background': colors.bg,
         'editorSuggestWidget.border': '#75715E',
         'editorWhitespace.foreground': '#464741',
         'editorWidget.background': '#1e1f1c',
@@ -218,7 +221,7 @@ const theme = {
         'inputValidation.warningBorder': '#e2e22e',
         'list.activeSelectionBackground': '#75715E',
         'list.dropBackground': '#414339',
-        'list.highlightForeground': c.fg,
+        'list.highlightForeground': colors.fg,
         'list.hoverBackground': '#3e3d32',
         'list.inactiveSelectionBackground': '#414339',
         'menu.background': '#1e1f1c',
@@ -226,10 +229,10 @@ const theme = {
         'minimap.selectionHighlight': '#878b9180',
         'panel.border': '#414339',
         'panelTitle.activeBorder': '#75715E',
-        'panelTitle.activeForeground': c.fg,
+        'panelTitle.activeForeground': colors.fg,
         'panelTitle.inactiveForeground': '#75715E',
         'peekView.border': '#75715E',
-        'peekViewEditor.background': c.bg,
+        'peekViewEditor.background': colors.bg,
         'peekViewEditor.matchHighlightBackground': '#75715E',
         'peekViewResult.background': '#1e1f1c',
         'peekViewResult.matchHighlightBackground': '#75715E',
@@ -242,7 +245,7 @@ const theme = {
         'selection.background': '#878b9180',
         'settings.focusedRowBackground': '#4143395A',
         'sideBar.background': '#1e1f1c',
-        'sideBarSectionHeader.background': c.bg,
+        'sideBarSectionHeader.background': colors.bg,
         'statusBar.background': '#414339',
         'statusBar.debuggingBackground': '#75715E',
         'statusBar.noFolderBackground': '#414339',
@@ -259,7 +262,7 @@ const theme = {
         'terminal.ansiBrightGreen': '#A6E22E',
         'terminal.ansiBrightMagenta': '#AE81FF',
         'terminal.ansiBrightRed': '#f92672',
-        'terminal.ansiBrightWhite': c.fg,
+        'terminal.ansiBrightWhite': colors.fg,
         'terminal.ansiBrightYellow': '#e2e22e', // hue shifted #A6E22E
         'terminal.ansiCyan': '#56ADBC',
         'terminal.ansiGreen': '#86B42B',
