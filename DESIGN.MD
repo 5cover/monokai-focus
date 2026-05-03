@@ -1,11 +1,5 @@
 # Monokai Focus
 
-I love Monokai for its visual pleasantness and consistency, but it does seem to color tokens non-semantically.
-
-This theme is a principled fork of Monokai that keeps background colors and general colorimetry but chooses foreground colors in a principled way, based on what tokens mean in a file.
-
-Monokai is fine, but as I started according more attention to the actual color and styles, I realized how much signal my brain has to throws away and ignore when reading the code. Clutter. Visual noise. This theme aims to minimize it.
-
 ## Scopes|TS
 
 ### (role) parameter
@@ -209,6 +203,7 @@ expressions:
     ?.
     , (when used as an operator)
     ...
+    await
 
 statements, for which the "arguments" are the blocks of code you pass into them:
 
@@ -217,6 +212,7 @@ statements, for which the "arguments" are the blocks of code you pass into them:
     try catch finally
     for [of]
     [do] while
+    for await
     =>
 
 TypeScript-specifc
@@ -257,8 +253,6 @@ expressions
     --
     delete
     yield
-    [for] await
-    ...
 
 syntax
 

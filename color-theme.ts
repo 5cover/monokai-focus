@@ -7,24 +7,35 @@ import { writeFileSync } from 'fs'
 const colors = colornames.reduce((o, { name, hex }) => Object.assign(o, { [name]: hex }), {})
 const _nearest = nearestColor.from(colors)
 const nearest = (c: ColorInstance) => _nearest(c.hex())
+interface A {}
+
+const core = {
+    green: color('hsl(90, 59%, 66%)'),
+    blue: color('hsl(186, 51%, 69%)'),
+    purple: color('hsl(250, 77%, 78%)'),
+    red: color('hsl(5, 90%, 72%)'),
+    yellow: color('hsl(45, 86%, 70%)'),
+}
+
+//color('hsl(315, 53%, 80%)')
 
 const c = {
-    invalid: color('#f53d3d'),
+    invalid: color('hsl(0, 90%, 60%)'),
     bg: color('#272822'),
     fg: color('hsl(60, 30%, 96%)'),
     fg1: color('hsl(60, 4%, 75%)'),
     fg2: color('hsl(60, 1%, 59%)'),
     fg2_5: color('hsl(60, 1%, 53%)'),
     comment: color('hsl(20, 96%, 70%)'),
-    text: color('hsl(45, 65%, 70%)'),
-    function: color('hsl(70, 80%, 60%)'),
-    type: color('hsl(140, 60%, 70%)'),
-    leaf: color('hsl(140, 60%, 70%)'),
-    declaration: color('hsl(200, 60%, 66%)'),
-    operation: color('hsl(250, 70%, 78%)'),
-    //instruction: color('hsl(345, 80%, 75%)'),
-    instruction: color('hsl(0, 90%, 70%)'),
-} as const
+    text: core.yellow,
+    operation: core.blue,
+    type: core.green,
+    leaf: core.green,
+    declaration: core.blue,
+    function: core.purple,
+    langvar: core.red,
+    instruction: core.red,
+}
 
 console.table(
     Object.entries(c).map(([k, cl]) => ({
@@ -55,10 +66,10 @@ const theme = {
         'editor.selectionHighlightBackground': '#575b6180',
         'editor.wordHighlightBackground': '#4a4a7680',
         'editor.wordHighlightStrongBackground': '#6a6a9680',
-        'editorBracketHighlight.foreground1': c.fg,
-        'editorBracketHighlight.foreground2': c.fg1,
-        'editorBracketHighlight.foreground3': c.fg2,
-        'editorBracketHighlight.foreground4': c.fg1,
+        //'editorBracketHighlight.foreground1': c.fg,
+        //'editorBracketHighlight.foreground2': c.fg1,
+        //'editorBracketHighlight.foreground3': c.fg2,
+        //'editorBracketHighlight.foreground4': c.fg1,
         'editorBracketHighlight.unexpectedBracket.foreground': c.invalid,
         'editorCursor.foreground': '#f8f8f0',
         'editorGroup.border': '#34352f',
@@ -222,20 +233,21 @@ const theme = {
             },
         },
         {
-            name: ' Language variables',
+            name: 'Language variables',
             scope: ['variable.language', 'keyword.control.import'],
             settings: {
-                foreground: c.fg1,
+                foreground: c.langvar,
                 fontStyle: 'italic',
             },
         },
         {
             name: 'Whites',
             scope: [
-                'punctuation.definition.template-expression.begin',
-                'punctuation.definition.template-expression.end',
+                'punctuation.definition.template-expression',
+                'punctuation.accessor.optional',
                 'keyword.operator.type.annotation',
-                "meta.brace"
+                'meta.brace',
+                'meta.object-literal.key',
             ],
             settings: {
                 foreground: c.fg,
@@ -250,7 +262,7 @@ const theme = {
         },
         {
             name: 'Functions',
-            scope: ['entity.name.function', 'meta.decorator', 'punctuation.definition.parameters'],
+            scope: ['entity.name.function', 'meta.decorator'],
             settings: {
                 foreground: c.function,
             },
@@ -284,19 +296,12 @@ const theme = {
         {
             name: 'Operations',
             scope: [
-                'keyword.operator.comparison',
-                'keyword.operator.relational',
-                'keyword.operator.arithmetic',
-                'keyword.operator.bitwise',
-                'keyword.operator.type',
-                'keyword.operator.logical',
-                'keyword.operator.ternary',
+                'keyword.operator.type.asserts',
                 'keyword.operator.expression.typeof',
                 'keyword.operator.expression.in',
                 'keyword.operator.expression.instanceof',
                 'keyword.operator.new',
                 'keyword.operator.expression.void',
-                'punctuation.accessor.optional',
                 'keyword.control.switch',
                 'keyword.control.conditional',
                 'keyword.control.trycatch',
@@ -318,7 +323,12 @@ const theme = {
         },
         {
             name: 'Instructions',
-            scope: 'keyword',
+            scope: [
+                'keyword.other.debugger',
+                'keyword.control.flow',
+                'keyword.control.with',
+                'keyword.operator.expression.delete',
+            ],
             settings: {
                 foreground: c.instruction,
             },
@@ -328,6 +338,55 @@ const theme = {
             scope: 'punctuation.accessor',
             settings: {
                 foreground: c.fg.alpha(1 / 3),
+            },
+        },
+        {
+            name: 'Headings',
+            scope: 'markup.heading',
+            settings: {
+                foreground: c.declaration,
+            },
+        },
+        {
+            name: 'Raw',
+            scope: ['markup.raw', 'markup.inline.raw'],
+            settings: {
+                foreground: c.text,
+            },
+        },
+        {
+            name: 'Quote',
+            scope: 'markup.quote',
+            settings: {
+                fontStyle: 'italic',
+            },
+        },
+        {
+            name: 'Punctuations',
+            scope: 'punctuation',
+            settings: {
+                fontStyle: '',
+            },
+        },
+        {
+            name: 'Italic',
+            scope: 'markup.italic',
+            settings: {
+                fontStyle: 'italic',
+            },
+        },
+        {
+            name: 'Bold',
+            scope: 'markup.bold',
+            settings: {
+                fontStyle: 'bold',
+            },
+        },
+        {
+            name: 'Italic&Bold',
+            scope: ['markup.italic markup.bold', 'markup.bold markup.italic'],
+            settings: {
+                fontStyle: 'bold italic',
             },
         },
     ],
