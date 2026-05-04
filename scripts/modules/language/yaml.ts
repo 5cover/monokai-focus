@@ -1,8 +1,7 @@
 import { r } from '../../../scripts/decleme.ts'
-import { s } from '../../styles.ts'
 
 export default [
-    r(s.fg, {
+    r('fg', {
         on: 'entity.name.tag.yaml',
     }),
 ]

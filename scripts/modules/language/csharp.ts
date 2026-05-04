@@ -1,8 +1,7 @@
 import { r } from '../../../scripts/decleme.ts'
-import { s } from '../../styles.ts'
 
 export default [
-    r(s.meta, {
+    r('meta', {
         on: 'punctuation.separator.hash.cs',
     }),
 ]

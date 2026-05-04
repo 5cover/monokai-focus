@@ -29,7 +29,7 @@ They do not support negation, parent references from the target, or combinatoria
 compileTokenColors(rules: Rule[], options?: CompileOptions): TmTokenColor[]
 ```
 
-Compiles decleme rules to VS Code token-color entries.
+Compiles decleme rules to VS Code token-color entries. Before selector expansion, plain rules with the same `StyleKey` are merged by OR-combining `on` and `no`. This lets modules reuse semantic style keys while producing one compact target rule per style.
 
 ```ts
 type CompileOptions = {
@@ -43,13 +43,13 @@ type CompileOptions = {
 The default values are used when compiling `no` exclusions into reset rules.
 
 ```ts
-rule(style, { on })
+r(styleKey, { on })
 ```
 
-Creates a binding between a style and one or more selectors. `on` is required.
+Creates a binding between a style key and one or more selectors. `on` is required. The style key must be a `StyleKey` exported by `styles.ts`.
 
 ```ts
-rule(style, { on, no })
+r(styleKey, { on, no })
 ```
 
 Creates the same binding, then creates positive reset rules for excluded contexts.
@@ -85,6 +85,13 @@ type Style = {
 }
 
 type FontStyle = 'italic' | 'bold' | 'underline' | 'strikethrough'
+
+const styles = {
+    declaration: { name: 'declaration', fg: colors.declaration },
+    operation: { name: 'operation', fg: colors.operation },
+} as const satisfies Record<string, Style>
+
+type StyleKey = keyof typeof styles
 ```
 
 Style fields compile as follows:
@@ -96,7 +103,9 @@ Style fields compile as follows:
 
 `in` is normalized by sorting and deduplicating font-style items. `in: []` intentionally emits `fontStyle: ''`, which clears inherited font style.
 
-When multiple styles are merged by `cross`, later styles override `fg`, `fontFamily`, `fontSize`, and `lineHeight`. Font styles are unioned unless a later style has `in: []`, which clears the accumulated font style. Merged rule names are joined with `&`.
+Rule identity is the style key, not `Style.name`. `name` is display metadata for the generated token-color entry.
+
+When multiple styles are merged by `cross`, later resolved styles override `fg`, `fontFamily`, `fontSize`, and `lineHeight`. Font styles are unioned unless a later style has `in: []`, which clears the accumulated font style. Merged rule names are joined from display names.
 
 ## Selector Values
 
@@ -197,8 +206,8 @@ Alternatives are flattened, sorted, and deduplicated within a compiled rule.
 
 ```ts
 cross(
-    rule({ name: 'Italic', in: 'italic' }, { on: 'markup.italic' }),
-    rule({ name: 'Bold', in: 'bold' }, { on: 'markup.bold' }),
+    r('emphasis', { on: 'markup.italic' }),
+    r('strong', { on: 'markup.bold' }),
 )
 ```
 
@@ -218,7 +227,7 @@ The merged rules use the merged style. For the example above, both combination s
 VS Code token-color entries do not have a native negative selector. `decleme` implements `no` by generating positive override rules.
 
 ```ts
-rule({ name: 'Text', fg: text }, {
+r('text', {
     on: 'string',
     no: 'meta.object-literal.key string',
 })

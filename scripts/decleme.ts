@@ -1,3 +1,5 @@
+import { styles, type StyleKey } from './styles.ts'
+
 export type FontStyle = 'italic' | 'bold' | 'underline' | 'strikethrough'
 
 export type Style = {
@@ -15,7 +17,7 @@ export type Rule = TokenRule | CrossRule
 
 export type TokenRule = {
     type: 'rule'
-    style: Style
+    style: StyleKey
     on: Scope
     no?: Scope
 }
@@ -61,7 +63,7 @@ export type TmSettings = {
     lineHeight?: number
 }
 
-export function r(style: Style, options: RuleOptions): TokenRule {
+export function r(style: StyleKey, options: RuleOptions): TokenRule {
     return { type: 'rule', style, on: options.on, no: options.no }
 }
 
@@ -78,7 +80,42 @@ export function cross(...rules: TokenRule[]): CrossRule {
 }
 
 export function compileTokenColors(rules: readonly Rule[], options: CompileOptions = {}): TmTokenColor[] {
-    return rules.flatMap(item => compileRule(item, options))
+    return mergeRules(rules)
+        .flatMap(item => compileRule(item, options))
+        .sort(({ name: a }, { name: b }) =>
+            a === b ? 0
+            : a === undefined || (b !== undefined && a < b) ? -1
+            : 1,
+        )
+}
+
+function mergeRules(rules: readonly Rule[]): Rule[] {
+    const mergedRules: Rule[] = []
+    const mergedByStyle = new Map<StyleKey, TokenRule>()
+
+    for (const item of rules) {
+        if (item.type === 'cross') {
+            mergedRules.push(item)
+            continue
+        }
+
+        const existing = mergedByStyle.get(item.style)
+        if (existing) {
+            existing.on = any(existing.on, item.on)
+            existing.no = combineOptionalScopes(existing.no, item.no)
+        } else {
+            const merged = { ...item }
+            mergedByStyle.set(item.style, merged)
+            mergedRules.push(merged)
+        }
+    }
+
+    return mergedRules
+}
+
+function combineOptionalScopes(left: Scope | undefined, right: Scope | undefined): Scope | undefined {
+    if (left && right) return any(left, right)
+    return left ?? right
 }
 
 function compileRule(item: Rule, options: CompileOptions): TmTokenColor[] {
@@ -87,13 +124,14 @@ function compileRule(item: Rule, options: CompileOptions): TmTokenColor[] {
 }
 
 function compileTokenRule(item: TokenRule, options: CompileOptions): TmTokenColor[] {
+    const style = resolveStyle(item.style)
     const scopes = uniqueSorted(expandScope(item.on))
-    const compiled: TmTokenColor[] = [toTokenColor(item.style, scopes)]
+    const compiled: TmTokenColor[] = [toTokenColor(style, scopes)]
 
     if (item.no) {
-        const resetStyle = invertStyle(item.style, options)
+        const resetStyle = invertStyle(style, options)
         const resetScopes = uniqueSorted(expandScope(item.no))
-        compiled.push(toTokenColor({ ...resetStyle, name: `${item.style.name ?? 'Rule'} reset` }, resetScopes))
+        compiled.push(toTokenColor({ ...resetStyle, name: `${style.name ?? item.style}.reset` }, resetScopes))
     }
 
     return compiled
@@ -106,7 +144,7 @@ function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] 
     for (let size = 2; size <= item.rules.length; size++) {
         for (const group of combinationsOf(item.rules, size)) {
             const style = {
-                ...group.reduce((style, item) => mergeStyles(style, item.style), {} as Style),
+                ...group.reduce((style, item) => mergeStyles(style, resolveStyle(item.style)), {} as Style),
                 ...combinedName(group),
             }
             const orders = permutations(group)
@@ -123,8 +161,15 @@ function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] 
 }
 
 function combinedName(rules: readonly TokenRule[]): Pick<Style, 'name'> {
-    const names = rules.flatMap(item => (item.style.name ? [item.style.name] : []))
+    const names = rules.flatMap(item => {
+        const style = resolveStyle(item.style)
+        return style.name ? [style.name] : []
+    })
     return names.length > 0 ? { name: names.sort().join(' ') } : {}
+}
+
+function resolveStyle(style: StyleKey): Style {
+    return styles[style]
 }
 
 function toTokenColor(style: Style, scopes: readonly string[]): TmTokenColor {

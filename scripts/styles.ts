@@ -31,7 +31,7 @@ export const colors = {
     meta: core.pink,
 }
 
-export const s = {
+export const styles = {
     fg: { name: 'fg', fg: colors.fg },
     langvar: { name: 'languageVariable', fg: colors.langvar, in: 'italic' },
     type: { name: 'type', fg: colors.type },
@@ -52,4 +52,6 @@ export const s = {
     emphasis: { name: 'emphasis', in: 'italic' },
     strong: { name: 'strong', in: 'bold' },
     quote: { name: 'quote', in: 'italic' },
-} satisfies Record<string, Style>
+} as const satisfies Record<string, Style>
+
+export type StyleKey = keyof typeof styles

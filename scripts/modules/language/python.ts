@@ -1,8 +1,7 @@
 import { r } from '../../../scripts/decleme.ts'
-import { s } from '../../styles.ts'
 
 export default [
-    r(s.operation, {
+    r('operation', {
         on: 'keyword.operator.logical.python',
     }),
 ]

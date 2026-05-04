@@ -1,10 +1,9 @@
 import { any, c, r, type Rule } from '../../scripts/decleme.ts'
-import { s } from '../styles.ts'
 
 export default [
-    r(s.langvar, { on: any('variable.language', 'keyword.control.import') }),
-    r(s.parameter, { on: 'variable.parameter' }),
-    r(s.type, {
+    r('langvar', { on: any('variable.language', 'keyword.control.import') }),
+    r('parameter', { on: 'variable.parameter' }),
+    r('type', {
         on: any(
             [any('support', 'keyword', 'entity.name'), 'type'],
             'punctuation.definition.typeparameters',
@@ -14,7 +13,7 @@ export default [
         ),
         no: 'support.type.property-name',
     }),
-    r(s.function, {
+    r('function', {
         on: any(
             'entity.name.function',
             'punctuation.decorator',
@@ -22,7 +21,7 @@ export default [
             c('meta.decorator', 'variable.other.readwrite'),
         ),
     }),
-    r(s.declaration, {
+    r('declaration', {
         on: any(
             'constant.language.import-export-all',
             ['keyword', any('other.typedef', 'control.require:type:export')],
@@ -41,7 +40,7 @@ export default [
         ),
         no: 'storage.type.function.arrow',
     }),
-    r(s.operation, {
+    r('operation', {
         on: any(
             [
                 'keyword',
@@ -53,9 +52,9 @@ export default [
             c('meta.type.parameters:declaration', 'storage.modifier'),
         ),
     }),
-    r(s.instruction, {
+    r('instruction', {
         on: ['keyword', any('other.debugger', 'control.flow:with:return', 'operator.expression.delete')],
     }),
-    r(s.dimPunctuation, { on: 'punctuation.accessor', no: 'punctuation.accessor.optional' }),
-    r(s.meta, { on: any('keyword.control.directive', 'keyword.preprocessor') }),
+    r('dimPunctuation', { on: 'punctuation.accessor', no: 'punctuation.accessor.optional' }),
+    r('meta', { on: any('keyword.control.directive', 'keyword.preprocessor') }),
 ] satisfies Rule[]
