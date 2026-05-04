@@ -1,7 +1,7 @@
 import { any, cross, r, type Rule } from '../../scripts/decleme.ts'
 
 export default [
-    r('strong', {
+    r('abstraction', {
         on: 'support.class.component',
     }),
     r('leaf', {
@@ -14,6 +14,6 @@ export default [
         r('quote', { on: 'markup.quote' }),
         r('declaration', { on: 'markup.heading' }),
     ),
-    r('declaration', { on: any('entity.name.section', 'punctuation.definition.list') }),
+    r('declaration', { on: 'entity.name.section' }),
     r('meta', { on: 'punctuation.section.embedded' }),
 ] satisfies Rule[]

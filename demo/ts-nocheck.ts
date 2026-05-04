@@ -1,7 +1,7 @@
 //@ts-nocheck
 `a${x}`;
 type Wrap<T> = [T];
-function wrap<T>() {
+function Wrap<T>() {
     
 }
 type X = number;
@@ -83,7 +83,7 @@ export * from 'module'
 import.meta;
 import fs = require('aa');
 export = require();
-export = {}
+export = {"a":1}
 export default { }
 
 {
@@ -171,6 +171,7 @@ function f(a,...x: readonly string[]) {
 
 switch(x) {
     case 2:
+        const fds = 45;
         break;
     default:
 }
@@ -236,6 +237,7 @@ break
 continue
 debugger
 return
+await 1;
 throw 1
 with (a) {}
 
@@ -245,7 +247,7 @@ with (a) {}
 143 as number // leaf
 type T = number;// type
 declare const t: T;// declaration
-x === x// operation
+typeof x// operation
 parseInt('8xsdsqdsq')// function
 delete x[0]// instruction
 this// langvar
@@ -254,3 +256,9 @@ this// langvar
 let ab = 5;
 ab += 5;
 ab = 18;
+
+await a;
+
+async function a() {
+    await g;
+}

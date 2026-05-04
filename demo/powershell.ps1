@@ -36,7 +36,7 @@ try {
     $temp = New-Object System.Object
     $temp | Add-Member -MemberType NoteProperty -Name "Title" -Value "Custom Object Title 1"
     $temp | Add-Member -MemberType NoteProperty -Name "Subject" -Value "Delegación del plan de acción [Folio_PlandeAccion]"
-    $temp | Add-Member -MemberType NoteProperty -Name "Body" -Value "<div>This s a note example, with lots of text</div>
+    $temp | Add-Member -MemberType NoteProperty -Name "Body" -Value "<div>This s a note ${a}example, with lots of text</div>
       <div> <br/>&#160;</div>
       <div>It happens to be in html format, but is just text the property couldnt't know<br/></div>
       <div><br/>&#160;<br/></div>

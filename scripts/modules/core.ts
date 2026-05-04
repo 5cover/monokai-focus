@@ -12,14 +12,15 @@ export default [
     r('text', {
         on: 'string',
         no: any(
+            'variable',
             c('meta.object-literal.key', 'string'),
             c(
                 'string',
                 any(
-                    'punctuation.definition.template-expression',
-                    'meta.template.expression',
+                    'punctuation.definition.template-expression:subshell:variable',
                     'punctuation.section.embedded',
-                    'meta.embedded',
+                    'meta.template.expression',
+                    'meta.embedded:parameter-expansion',
                 ),
             ),
         ),

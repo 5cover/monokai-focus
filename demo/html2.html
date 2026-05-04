@@ -1,0 +1,148 @@
+<div>
+    <div
+        style="
+            color: #f8f8f2;
+            background-color: #272822;
+            font-family: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+            font-weight: normal;
+            font-size: 14px;
+            line-height: 22px;
+            white-space: pre;
+        "
+    >
+        <div>
+            <span style="color: #88d0d8">type</span><span style="color: #f8f8f2"> </span
+            ><span style="color: #a8db75">Result</span><span style="color: #a8db75">&lt;</span
+            ><span style="color: #a8db75; font-style: italic">T</span><span style="color: #f8f8f2">, </span
+            ><span style="color: #a8db75; font-style: italic">E</span><span style="color: #f8f8f2"> = </span
+            ><span style="color: #a8db75">Error</span><span style="color: #a8db75">&gt;</span
+            ><span style="color: #f8f8f2"> =</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; | { </span><span style="color: #f8f8f2">ok</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">true</span
+            ><span style="color: #f8f8f2">; </span><span style="color: #f8f8f2">value</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75; font-style: italic">T</span
+            ><span style="color: #f8f8f2"> }</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; | { </span><span style="color: #f8f8f2">ok</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">false</span
+            ><span style="color: #f8f8f2">; </span><span style="color: #f8f8f2">error</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75; font-style: italic">E</span
+            ><span style="color: #f8f8f2"> };</span>
+        </div>
+        <br />
+        <div>
+            <span style="color: #88d0d8">async</span><span style="color: #f8f8f2"> </span
+            ><span style="color: #88d0d8">function</span><span style="color: #f8f8f2"> </span
+            ><span style="color: #debad6">loadJson</span><span style="color: #a8db75">&lt;</span
+            ><span style="color: #a8db75; font-style: italic">T</span><span style="color: #a8db75">&gt;</span
+            ><span style="color: #f8f8f2">(</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; </span><span style="color: #f8f8f2; font-style: italic">url</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">string</span
+            ><span style="color: #f8f8f2">,</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; </span><span style="color: #debad6">parse</span
+            ><span style="color: #f8f8f2">: (</span><span style="color: #f8f8f2; font-style: italic">input</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">unknown</span
+            ><span style="color: #f8f8f2">) </span><span style="color: #f8f8f2">=&gt;</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #a8db75; font-style: italic">T</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">): </span><span style="color: #a8db75">Promise</span
+            ><span style="color: #a8db75">&lt;</span><span style="color: #a8db75">Result</span
+            ><span style="color: #a8db75">&lt;</span><span style="color: #a8db75; font-style: italic">T</span
+            ><span style="color: #a8db75">&gt;&gt;</span><span style="color: #f8f8f2"> {</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; </span
+            ><span style="color: #fcb369">// Fetch, validate, and normalize remote data.</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; </span><span style="color: #88d0d8">const</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #f8f8f2">response</span
+            ><span style="color: #f8f8f2"> = </span><span style="color: #f2958c">await</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #debad6">fetch</span
+            ><span style="color: #f8f8f2">(</span><span style="color: #f8f8f2; font-style: italic">url</span
+            ><span style="color: #f8f8f2">);</span>
+        </div>
+        <br />
+        <div>
+            <span style="color: #f8f8f2">&nbsp; </span><span style="color: #88d0d8">if</span
+            ><span style="color: #f8f8f2"> (!</span><span style="color: #f8f8f2">response</span
+            ><span style="color: #f8f8f2">.</span><span style="color: #f8f8f2">ok</span
+            ><span style="color: #f8f8f2">) {</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; &nbsp; </span><span style="color: #f2958c">return</span
+            ><span style="color: #f8f8f2"> { </span><span style="color: #f8f8f2">ok</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">false</span
+            ><span style="color: #f8f8f2">, </span><span style="color: #f8f8f2">error</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #88d0d8">new</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #a8db75">Error</span
+            ><span style="color: #f8f8f2">(</span><span style="color: #eccf79">`HTTP </span
+            ><span style="color: #f8f8f2">${</span><span style="color: #f8f8f2">response</span
+            ><span style="color: #f8f8f2">.</span><span style="color: #f8f8f2">status</span
+            ><span style="color: #f8f8f2">}</span><span style="color: #eccf79">`</span
+            ><span style="color: #f8f8f2">) };</span>
+        </div>
+        <div><span style="color: #f8f8f2">&nbsp; }</span></div>
+        <br />
+        <div>
+            <span style="color: #f8f8f2">&nbsp; </span><span style="color: #88d0d8">let</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #f8f8f2">payload</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">unknown</span
+            ><span style="color: #f8f8f2"> = </span><span style="color: #f2958c">await</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #f8f8f2">response</span
+            ><span style="color: #f8f8f2">.</span><span style="color: #debad6">json</span
+            ><span style="color: #f8f8f2">();</span>
+        </div>
+        <br />
+        <div>
+            <span style="color: #f8f8f2">&nbsp; </span><span style="color: #88d0d8">try</span
+            ><span style="color: #f8f8f2"> {</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; &nbsp; </span><span style="color: #f8f8f2">payload</span
+            ><span style="color: #f8f8f2"> = </span><span style="color: #debad6">parse</span
+            ><span style="color: #f8f8f2">(</span><span style="color: #f8f8f2">payload</span
+            ><span style="color: #f8f8f2">);</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; &nbsp; </span><span style="color: #f2958c">return</span
+            ><span style="color: #f8f8f2"> { </span><span style="color: #f8f8f2">ok</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">true</span
+            ><span style="color: #f8f8f2">, </span><span style="color: #f8f8f2">value</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #f8f8f2">payload</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #88d0d8">as</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #a8db75; font-style: italic">T</span
+            ><span style="color: #f8f8f2"> };</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; } </span><span style="color: #88d0d8">catch</span
+            ><span style="color: #f8f8f2"> (</span><span style="color: #f8f8f2">error</span
+            ><span style="color: #f8f8f2">) {</span>
+        </div>
+        <div>
+            <span style="color: #f8f8f2">&nbsp; &nbsp; </span><span style="color: #f2958c">return</span
+            ><span style="color: #f8f8f2"> { </span><span style="color: #f8f8f2">ok</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #a8db75">false</span
+            ><span style="color: #f8f8f2">, </span><span style="color: #f8f8f2">error</span
+            ><span style="color: #f8f8f2">: </span><span style="color: #f8f8f2">error</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #88d0d8">instanceof</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #a8db75">Error</span
+            ><span style="color: #f8f8f2"> ? </span><span style="color: #f8f8f2">error</span
+            ><span style="color: #f8f8f2"> : </span><span style="color: #88d0d8">new</span
+            ><span style="color: #f8f8f2"> </span><span style="color: #a8db75">Error</span
+            ><span style="color: #f8f8f2">(</span><span style="color: #eccf79">"Invalid payload"</span
+            ><span style="color: #f8f8f2">) };</span>
+        </div>
+        <div><span style="color: #f8f8f2">&nbsp; }</span></div>
+        <div><span style="color: #f8f8f2">}</span></div>
+    </div>
+    <br />
+</div>

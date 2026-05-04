@@ -67,14 +67,17 @@ export function r(style: StyleKey, options: RuleOptions): TokenRule {
 }
 
 export function any(...parts: Scope[]): AnySelector {
+    if (parts.length < 2) console.error('warning: any called with', parts.length, 'parts')
     return { type: 'any', parts }
 }
 
 export function c(...parts: Scope[]): DescendingSelector {
+    if (parts.length < 1) console.error('warning: c called with', parts.length, 'parts')
     return { type: 'c', parts }
 }
 
 export function cross(...rules: TokenRule[]): CrossRule {
+    if (rules.length < 2) console.error('warning: cross called with', rules.length, 'rules')
     return { type: 'cross', rules }
 }
 

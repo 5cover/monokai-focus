@@ -58,6 +58,7 @@ while (true) {}
 
 switch (2) {
     case 2:
+        const x = 1;
         break
     default:
         break
