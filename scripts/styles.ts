@@ -51,7 +51,7 @@ export const styles = {
     parameter: { name: 'parameter', in: 'italic' },
     emphasis: { name: 'emphasis', in: 'italic' },
     strong: { name: 'strong', in: 'bold' },
-    quote: { name: 'quote', in: 'italic' },
+    quote: { name: 'quote', fg: colors.fg1 },
 } as const satisfies Record<string, Style>
 
 export type StyleKey = keyof typeof styles

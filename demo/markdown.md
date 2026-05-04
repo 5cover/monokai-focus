@@ -17,6 +17,11 @@
 - [ ] check check 12 12
 - [ ] check check 12 12
 
+|a    |b    |c    |
+|:----|:---:|----:|
+|this |is   |table|
+|table|this |is   |
+
 Heading 1
 ========
 
@@ -24,3 +29,5 @@ Heading 2
 --------------
 
 ### Heading 3
+
+<details></details>

@@ -14,6 +14,5 @@ export default [
         r('quote', { on: 'markup.quote' }),
         r('declaration', { on: 'markup.heading' }),
     ),
-    r('declaration', { on: 'entity.name.section' }),
-    r('leaf', { on: 'punctuation.definition.list' }),
+    r('declaration', { on: any('entity.name.section', 'punctuation.definition.list') }),
 ] satisfies Rule[]
