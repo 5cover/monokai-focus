@@ -4,7 +4,7 @@ import color, { type ColorInstance } from 'color'
 import { writeFileSync } from 'fs'
 import { compileTokenColors } from './decleme.ts'
 import { join } from 'path'
-import { colors } from './colors.ts'
+import { colors } from './styles.ts'
 import tokenColors from './tokenColors.ts'
 
 // nearestColor expects an object { name => hex }
@@ -51,9 +51,6 @@ const theme = {
         typeParameter: {
             fontStyle: 'italic',
             foreground: colors.type,
-        },
-        '*.modification': {
-            fontStyle: 'italic',
         },
         '*.typeHint': {
             foreground: colors.type,

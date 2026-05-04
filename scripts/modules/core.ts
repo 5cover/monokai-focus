@@ -1,12 +1,12 @@
 import { any, c, r, type Rule } from '../../scripts/decleme.ts'
-import { s } from '../../scripts/colors.ts'
+import { s } from '../styles.ts'
 
 export default [
     r(s.illegal, { on: 'invalid.illegal' }),
     r(s.deprecated, { on: 'invalid.deprecated' }),
     r(s.comment, { on: 'comment' }),
     r(s.documentation, { on: 'comment.:block.documentation' }),
-    r(s.documentationSyntax, { on: 'storage.type.class.jsdoc' }),
+    r(s.documentationSyntax, { on: any('storage.type.class.jsdoc', 'constant.string.documentation') }),
     r(s.leaf, { on: 'constant' }),
     r(s.text, {
         on: 'string',

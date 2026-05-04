@@ -5,5 +5,6 @@ import styling from './modules/styling.ts'
 import python from './modules/language/python.ts'
 import csharp from './modules/language/csharp.ts'
 import yaml from './modules/language/yaml.ts'
+import powershell from './modules/language/powershell.ts'
 
-export default [...core, ...code, ...styling, ...markup, ...python, ...csharp, ...yaml]
+export default [...core, ...code, ...styling, ...markup, ...python, ...csharp, ...yaml, ...powershell]

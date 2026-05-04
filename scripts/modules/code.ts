@@ -1,8 +1,9 @@
 import { any, c, r, type Rule } from '../../scripts/decleme.ts'
-import { s } from '../../scripts/colors.ts'
+import { s } from '../styles.ts'
 
 export default [
     r(s.langvar, { on: any('variable.language', 'keyword.control.import') }),
+    r(s.parameter, { on: 'variable.parameter' }),
     r(s.type, {
         on: any(
             [any('support', 'keyword', 'entity.name'), 'type'],
@@ -13,7 +14,14 @@ export default [
         ),
         no: 'support.type.property-name',
     }),
-    r(s.function, { on: any('entity.name.function', 'punctuation.decorator', 'meta.function.decorator') }),
+    r(s.function, {
+        on: any(
+            'entity.name.function',
+            'punctuation.decorator',
+            'meta.function.decorator',
+            c('meta.decorator', 'variable.other.readwrite'),
+        ),
+    }),
     r(s.declaration, {
         on: any(
             'constant.language.import-export-all',

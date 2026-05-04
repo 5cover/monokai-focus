@@ -1,5 +1,5 @@
 import { any, r, type Rule } from '../../scripts/decleme.ts'
-import { s } from '../../scripts/colors.ts'
+import { s } from '../styles.ts'
 
 export default [
     r(s.meta, { on: 'keyword.control.at-rule' }),

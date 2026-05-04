@@ -2,7 +2,7 @@ import { r } from '../../../scripts/decleme.ts'
 import { s } from '../../styles.ts'
 
 export default [
-    r(s.operation, {
-        on: 'keyword.operator.logical.python',
+    r(s.instruction, {
+        on: 'keyword.control.powershell',
     }),
 ]

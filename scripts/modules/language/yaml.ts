@@ -1,5 +1,5 @@
 import { r } from '../../../scripts/decleme.ts'
-import { s } from '../../../scripts/colors.ts'
+import { s } from '../../styles.ts'
 
 export default [
     r(s.fg, {
