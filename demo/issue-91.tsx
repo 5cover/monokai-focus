@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react'
 import calculate from '../logic/calculate'
 import './App.css'

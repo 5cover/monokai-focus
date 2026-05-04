@@ -126,9 +126,10 @@ class RegisteredExtension {
 class Utils {
  public:
   static inline bool ApiCheck(bool condition,
-                              const char* location,
+                              const char location,
                               const char* message) {
     if (!condition) Utils::ReportApiFailure(location, message);
+    *message;
     return condition;
   }
   static void ReportOOMFailure(v8::internal::Isolate* isolate,

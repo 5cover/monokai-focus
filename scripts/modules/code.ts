@@ -5,26 +5,27 @@ export default [
     r('parameter', { on: 'variable.parameter' }),
     r('type', {
         on: any(
-            [any('support', 'keyword', 'entity.name'), 'type'],
+            'support:keyword.type',
+            'entity.name.type',
+            'storage.type.primitive:struct',
             'punctuation.definition.typeparameters',
-            'storage.modifier.pointer',
             'entity.other.inherited-class',
-            'punctuation.section.angle-brackets',
+            'punctuation.section.angle-brackets.begin:end.template.call',
         ),
         no: 'support.type.property-name',
     }),
-    r('function', {
+    r('abstraction', {
         on: any(
+            'punctuation.section.arguments:parameters.begin:end',
             'entity.name.function',
             'punctuation.decorator',
-            'meta.function.decorator',
-            c('meta.decorator', 'variable.other.readwrite'),
+            c('meta.decorator', any('variable.other.readwrite')),
         ),
     }),
     r('declaration', {
         on: any(
             'constant.language.import-export-all',
-            ['keyword', any('other.typedef', 'control.require:type:export')],
+            ['keyword', any('declaration', 'other.typedef:import', 'control.require:type:export', 'new')],
             [
                 'meta',
                 any(
@@ -36,25 +37,30 @@ export default [
                     ),
                 ),
             ],
-            'storage.type:modifier',
+            'storage.modifier',
+            'storage.type.:modifier',
+            'punctuation.section.angle-brackets.begin:end.template.definition'
         ),
-        no: 'storage.type.function.arrow',
+        no: any('storage.type.function.arrow', 'storage.modifier.pointer:reference'),
     }),
     r('operation', {
         on: any(
             [
                 'keyword',
-                any('control.switch:conditional:trycatch:as:satisfies:loop:if', [
-                    'operator',
-                    any('type.asserts', 'expression.typeof:in:instanceof:void:of:keyof:as:infer:is', 'new'),
-                ]),
-            ],
-            c('meta.type.parameters:declaration', 'storage.modifier'),
+                any(
+                    'control.switch:conditional:trycatch:as:satisfies:loop:if',
+                    [
+                        'operator',
+                        any('type.asserts', 'expression.typeof:in:instanceof:void:of:keyof:as:infer:is', 'new'),
+                    ],
+                    'other.new',
+                ),
+            ]
         ),
     }),
     r('instruction', {
-        on: ['keyword', any('other.debugger', 'control.flow:with:return', 'operator.expression.delete')],
+        on: ['keyword', any('other.debugger', 'control.:flow:with:return', 'operator.expression.delete')],
     }),
     r('dimPunctuation', { on: 'punctuation.accessor', no: 'punctuation.accessor.optional' }),
-    r('meta', { on: any('keyword.control.directive', 'keyword.preprocessor') }),
+    r('meta', { on: any('keyword.control.directive', 'entity.name.function.preprocessor', 'keyword.preprocessor') }),
 ] satisfies Rule[]

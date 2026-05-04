@@ -4,7 +4,7 @@ import color, { type ColorInstance } from 'color'
 import { writeFileSync } from 'fs'
 import { compileTokenColors } from './decleme.ts'
 import { join } from 'path'
-import { colors } from './styles.ts'
+import { colors, semanticTokenColors } from './styles.ts'
 import tokenColors from './tokenColors.ts'
 
 // nearestColor expects an object { name => hex }
@@ -26,36 +26,7 @@ console.table(
 
 const theme = {
     semanticHighlighting: true,
-    semanticTokenColors: {
-        '*.deprecated': {
-            fontStyle: 'strikethrough',
-        },
-        comment: colors.comment,
-        decorator: colors.function,
-        enum: colors.type,
-        function: colors.function,
-        interface: colors.type,
-        keyword: colors.instruction,
-        macro: colors.function,
-        method: colors.function,
-        namespace: colors.type,
-        number: colors.leaf,
-        operator: colors.operation,
-        parameter: {
-            fontStyle: 'italic',
-        },
-        regexp: colors.text,
-        string: colors.text,
-        struct: colors.type,
-        type: colors.type,
-        typeParameter: {
-            fontStyle: 'italic',
-            foreground: colors.type,
-        },
-        '*.typeHint': {
-            foreground: colors.type,
-        },
-    },
+    semanticTokenColors,
     tokenColors: compileTokenColors(tokenColors, { defaultForeground: colors.fg }),
     type: 'dark',
     colors: {

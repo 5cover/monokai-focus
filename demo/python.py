@@ -29,6 +29,7 @@ class SomeClass:
     def insert_to_arr(self, value):  #An instance method
         self.arr.append(value)
         
+    @classmethod(56)
     @classmethod
     def class_method(cls):
         print("the class method was called")

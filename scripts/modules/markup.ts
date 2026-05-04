@@ -1,11 +1,11 @@
 import { any, cross, r, type Rule } from '../../scripts/decleme.ts'
 
 export default [
-    r('function', {
+    r('strong', {
         on: 'support.class.component',
     }),
     r('leaf', {
-        on: 'entity.name.tag',
+        on: any('entity.name.tag', 'punctuation.definition.tag'),
     }),
     r('text', { on: any('markup.raw', 'markup.inline.raw') }),
     cross(
@@ -15,4 +15,5 @@ export default [
         r('declaration', { on: 'markup.heading' }),
     ),
     r('declaration', { on: any('entity.name.section', 'punctuation.definition.list') }),
+    r('meta', { on: 'punctuation.section.embedded' }),
 ] satisfies Rule[]

@@ -1,7 +1,7 @@
 import { r } from '../../../scripts/decleme.ts'
 
 export default [
-    r('type', {
-        no: 'entity.name.tag.yaml',
+    r('declaration', {
+        on: 'storage.type.tsx:jsx:js:ts',
     }),
 ]

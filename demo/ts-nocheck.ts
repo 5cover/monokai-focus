@@ -1,7 +1,9 @@
 //@ts-nocheck
-
 `a${x}`;
 type Wrap<T> = [T];
+function wrap<T>() {
+    
+}
 type X = number;
 (
     (

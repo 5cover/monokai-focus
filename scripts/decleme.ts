@@ -1,10 +1,12 @@
+import type { ColorInstance } from 'color'
 import { styles, type StyleKey } from './styles.ts'
+import type { TextMateSettings, TextMateTokenColor, TokenStylingStyle } from './types.ts'
 
 export type FontStyle = 'italic' | 'bold' | 'underline' | 'strikethrough'
 
 export type Style = {
     name?: string
-    fg?: unknown
+    fg?: ColorInstance
     in?: FontStyle | readonly FontStyle[]
     fontFamily?: string
     fontSize?: number
@@ -18,12 +20,12 @@ export type Rule = TokenRule | CrossRule
 export type TokenRule = {
     type: 'rule'
     style: StyleKey
-    on: Scope
+    on?: Scope
     no?: Scope
 }
 
 export type RuleOptions = {
-    on: Scope
+    on?: Scope
     no?: Scope
 }
 
@@ -43,24 +45,21 @@ export type DescendingSelector = {
 }
 
 export type CompileOptions = {
-    defaultForeground?: unknown
+    defaultForeground?: ColorInstance
     defaultFontFamily?: string
     defaultFontSize?: number
     defaultLineHeight?: number
 }
-
-export type TmTokenColor = {
-    name?: string
-    scope: string | string[]
-    settings: TmSettings
-}
-
-export type TmSettings = {
-    foreground?: unknown
-    fontStyle?: string
-    fontFamily?: string
-    fontSize?: number
-    lineHeight?: number
+export function semantic(style: Pick<Style, 'fg' | 'in'>): TokenStylingStyle {
+    return (
+            style.fg !== undefined &&
+                (style.in === undefined || (typeof style.in !== 'string' && style.in.length === 0))
+        ) ?
+            style.fg
+        :   {
+                foreground: style.fg,
+                fontStyle: isArray(style.in) ? style.in.toSorted().join(' ') : style.in,
+            }
 }
 
 export function r(style: StyleKey, options: RuleOptions): TokenRule {
@@ -79,7 +78,7 @@ export function cross(...rules: TokenRule[]): CrossRule {
     return { type: 'cross', rules }
 }
 
-export function compileTokenColors(rules: readonly Rule[], options: CompileOptions = {}): TmTokenColor[] {
+export function compileTokenColors(rules: readonly Rule[], options: CompileOptions = {}): TextMateTokenColor[] {
     return mergeRules(rules)
         .flatMap(item => compileRule(item, options))
         .sort(({ name: a }, { name: b }) =>
@@ -101,7 +100,7 @@ function mergeRules(rules: readonly Rule[]): Rule[] {
 
         const existing = mergedByStyle.get(item.style)
         if (existing) {
-            existing.on = any(existing.on, item.on)
+            existing.on = combineOptionalScopes(existing.on, item.on)
             existing.no = combineOptionalScopes(existing.no, item.no)
         } else {
             const merged = { ...item }
@@ -118,16 +117,18 @@ function combineOptionalScopes(left: Scope | undefined, right: Scope | undefined
     return left ?? right
 }
 
-function compileRule(item: Rule, options: CompileOptions): TmTokenColor[] {
+function compileRule(item: Rule, options: CompileOptions): TextMateTokenColor[] {
     if (item.type === 'cross') return compileCross(item, options)
     return compileTokenRule(item, options)
 }
 
-function compileTokenRule(item: TokenRule, options: CompileOptions): TmTokenColor[] {
+function compileTokenRule(item: TokenRule, options: CompileOptions): TextMateTokenColor[] {
     const style = resolveStyle(item.style)
-    const scopes = uniqueSorted(expandScope(item.on))
-    const compiled: TmTokenColor[] = [toTokenColor(style, scopes)]
-
+    const scopes = item.on ? uniqueSorted(expandScope(item.on)) : []
+    const compiled: TextMateTokenColor[] = [toTokenColor(style, scopes)]
+    if (scopes.length === 0) {
+        console.log('warning: empty rule: ', item)
+    }
     if (item.no) {
         const resetStyle = invertStyle(style, options)
         const resetScopes = uniqueSorted(expandScope(item.no))
@@ -137,9 +138,9 @@ function compileTokenRule(item: TokenRule, options: CompileOptions): TmTokenColo
     return compiled
 }
 
-function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] {
+function compileCross(item: CrossRule, options: CompileOptions): TextMateTokenColor[] {
     const base = item.rules.flatMap(item => compileTokenRule(item, options))
-    const combinations: TmTokenColor[] = []
+    const combinations: TextMateTokenColor[] = []
 
     for (let size = 2; size <= item.rules.length; size++) {
         for (const group of combinationsOf(item.rules, size)) {
@@ -150,7 +151,7 @@ function compileCross(item: CrossRule, options: CompileOptions): TmTokenColor[] 
             const orders = permutations(group)
             const scopes = uniqueSorted(
                 orders.flatMap(ordered =>
-                    cartesian(ordered.map(item => expandScope(item.on))).map(parts => parts.join(' ')),
+                    cartesian(ordered.map(item => (item.on ? expandScope(item.on) : []))).map(parts => parts.join(' ')),
                 ),
             )
             combinations.push(toTokenColor(style, scopes))
@@ -172,7 +173,7 @@ function resolveStyle(style: StyleKey): Style {
     return styles[style]
 }
 
-function toTokenColor(style: Style, scopes: readonly string[]): TmTokenColor {
+function toTokenColor(style: Style, scopes: readonly string[]): TextMateTokenColor {
     return {
         ...(style.name ? { name: style.name } : {}),
         scope: scopes.length === 1 ? scopes[0] : [...scopes],
@@ -180,7 +181,7 @@ function toTokenColor(style: Style, scopes: readonly string[]): TmTokenColor {
     }
 }
 
-function toSettings(style: Style): TmSettings {
+function toSettings(style: Style): TextMateSettings {
     return {
         ...('fg' in style ? { foreground: style.fg } : {}),
         ...('in' in style ? { fontStyle: normalizeFontStyle(style.in) } : {}),
@@ -234,15 +235,15 @@ function toFontStyleArray(value: Style['in']): FontStyle[] {
 
 function expandScope(scope: Scope): string[] {
     if (typeof scope === 'string') return expandAtom(scope)
-    if (isScopeArray(scope)) {
+    if (isArray(scope)) {
         return cartesian(scope.map(expandScope)).map(parts => parts.filter(Boolean).join('.'))
     }
     if (scope.type === 'any') return scope.parts.flatMap(expandScope)
     return cartesian(scope.parts.map(expandScope)).map(parts => parts.filter(Boolean).join(' '))
 }
 
-function isScopeArray(scope: Scope): scope is readonly Scope[] {
-    return Array.isArray(scope)
+function isArray(arr: unknown): arr is readonly unknown[] {
+    return Array.isArray(arr)
 }
 
 function expandAtom(atom: string): string[] {

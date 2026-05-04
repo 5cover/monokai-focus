@@ -6,5 +6,20 @@ import python from './modules/language/python.ts'
 import csharp from './modules/language/csharp.ts'
 import yaml from './modules/language/yaml.ts'
 import powershell from './modules/language/powershell.ts'
+import markdown from './modules/language/markdown.ts'
+import ecmascript from './modules/language/ecmascript.ts'
+import cpp from './modules/language/cpp.ts'
 
-export default [...core, ...code, ...styling, ...markup, ...python, ...csharp, ...yaml, ...powershell]
+export default [
+    ...core,
+    ...code,
+    ...styling,
+    ...markup,
+    ...python,
+    ...csharp,
+    ...yaml,
+    ...powershell,
+    ...markdown,
+    ...ecmascript,
+    ...cpp
+]
