@@ -76,6 +76,7 @@ class Class extends URL {
 import 'module'
 import {foo as bar} from 'module';
 import * as baz from 'module';
+import {default as ff} from 'module';
 
 export { foo as qux }
 export * from 'module'
