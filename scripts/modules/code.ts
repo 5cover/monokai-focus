@@ -25,8 +25,7 @@ export default [
     }),
     r('declaration', {
         on: any(
-            'constant.language.import-export-all',
-            ['keyword', any('declaration', 'other.typedef:import', 'control.require:type:export', 'new')],
+            ['keyword', any('declaration', 'other.typedef:import', 'type.new')],
             'punctuation.section.angle-brackets.begin:end.template.definition',
             'storage.type:modifier',
         ),

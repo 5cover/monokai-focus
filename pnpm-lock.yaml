@@ -8,6 +8,12 @@ importers:
 
   .:
     devDependencies:
+      '@jsonjoy.com/json-pointer':
+        specifier: ^18.20.0
+        version: 18.20.0(tslib@2.8.1)
+      '@types/json-schema':
+        specifier: ^7.0.15
+        version: 7.0.15
       '@types/nearest-color':
         specifier: ^0.4.1
         version: 0.4.1
@@ -28,6 +34,39 @@ importers:
         version: 6.0.3
 
 packages:
+
+  '@jsonjoy.com/buffers@18.20.0':
+    resolution: {integrity: sha512-cJtMSmb+REkaw5bGjFI0HGrN5YAeN3FE1f+fDJxwlUehTdAGuKxOfwQltP0RZYn+6hAHq/50joMG7urUgfECXw==}
+    engines: {node: '>=10.0'}
+    peerDependencies:
+      tslib: '2'
+
+  '@jsonjoy.com/codegen@18.20.0':
+    resolution: {integrity: sha512-mGtXEk8O5Q2ApLnsQLa9CoPOo2KXI5TRPaXX3NnUVFdYb88LE56eGkDZWopmsu2v6/SIjbSBvaNBNI/IDgprYg==}
+    engines: {node: '>=10.0'}
+    peerDependencies:
+      tslib: '2'
+
+  '@jsonjoy.com/json-equal@18.20.0':
+    resolution: {integrity: sha512-fNtB5Bv3rx42jfzpjh05kMGCVgZzCfF4CaOlECDcayBSpjhxN01T4VUUGGmVrmb2h/UEPxvUBGEvK4EnZ93AFw==}
+    engines: {node: '>=10.0'}
+    peerDependencies:
+      tslib: '*'
+
+  '@jsonjoy.com/json-pointer@18.20.0':
+    resolution: {integrity: sha512-9RWJ43QCAuA4e/THp8Q6x2GBsfc8T/u3t27YCxcbSJzs3vfrbhHzPbNi3BqQXNZ26IcT/BfK7irscRzdy2ZJgg==}
+    engines: {node: '>=10.0'}
+    peerDependencies:
+      tslib: '2'
+
+  '@jsonjoy.com/util@18.20.0':
+    resolution: {integrity: sha512-qp2pEdwN2GPsd1QNz+Wv/u3jwU472Vr1QHdf53e3fCvU3QVGmcRSdFLA9/nU0Q06++fyYjxrEoCRJWmdlUB4Gw==}
+    engines: {node: '>=10.0'}
+    peerDependencies:
+      tslib: '2'
+
+  '@types/json-schema@7.0.15':
+    resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
   '@types/nearest-color@0.4.1':
     resolution: {integrity: sha512-nxe9cdPrS0Gh3FRxDSHyB6Ep3OCCKqqBAYTj0EyT21aInkNESV9Vm0IS+ibeqkycSjadlAHmworjBgqz266S3w==}
@@ -58,6 +97,9 @@ packages:
   nearest-color@0.4.4:
     resolution: {integrity: sha512-orhcaIORC10tf41Ld2wwlcC+FaAavHG87JHWB3eHH5p7v2k9Tzym2XNEZzLAm5YJwGv6Q38WWc7SOb+Qfu/4NQ==}
 
+  tslib@2.8.1:
+    resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
+
   typescript@6.0.3:
     resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
     engines: {node: '>=14.17'}
@@ -67,6 +109,33 @@ packages:
     resolution: {integrity: sha512-qYVnV5OEm2AW8cJMCpdV20CDyaN3g0AjDlOGf1OW4iaDEx8MwdtChUp4zu4H0VP3nDRF/8RKWH+IPp9uW0YGZg==}
 
 snapshots:
+
+  '@jsonjoy.com/buffers@18.20.0(tslib@2.8.1)':
+    dependencies:
+      tslib: 2.8.1
+
+  '@jsonjoy.com/codegen@18.20.0(tslib@2.8.1)':
+    dependencies:
+      tslib: 2.8.1
+
+  '@jsonjoy.com/json-equal@18.20.0(tslib@2.8.1)':
+    dependencies:
+      '@jsonjoy.com/codegen': 18.20.0(tslib@2.8.1)
+      tslib: 2.8.1
+
+  '@jsonjoy.com/json-pointer@18.20.0(tslib@2.8.1)':
+    dependencies:
+      '@jsonjoy.com/util': 18.20.0(tslib@2.8.1)
+      tslib: 2.8.1
+
+  '@jsonjoy.com/util@18.20.0(tslib@2.8.1)':
+    dependencies:
+      '@jsonjoy.com/buffers': 18.20.0(tslib@2.8.1)
+      '@jsonjoy.com/codegen': 18.20.0(tslib@2.8.1)
+      '@jsonjoy.com/json-equal': 18.20.0(tslib@2.8.1)
+      tslib: 2.8.1
+
+  '@types/json-schema@7.0.15': {}
 
   '@types/nearest-color@0.4.1': {}
 
@@ -92,6 +161,8 @@ snapshots:
       color-string: 2.1.4
 
   nearest-color@0.4.4: {}
+
+  tslib@2.8.1: {}
 
   typescript@6.0.3: {}
 

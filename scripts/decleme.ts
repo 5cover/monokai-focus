@@ -67,7 +67,7 @@ export function r(style: StyleKey, options: RuleOptions): TokenRule {
 }
 
 export function any(...parts: Scope[]): AnySelector {
-    if (parts.length < 2) console.error('warning: any called with', parts.length, 'parts')
+    if (parts.length < 1) console.error('warning: any called with', parts.length, 'parts')
     return { type: 'any', parts }
 }
 
