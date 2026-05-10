@@ -1,4 +1,4 @@
-import { any, c, r, type Rule } from '../../scripts/decleme.ts'
+import { any, c, r, type Rule } from '../decleme.ts'
 
 export default [
     r('parameter', { on: 'variable.parameter' }),

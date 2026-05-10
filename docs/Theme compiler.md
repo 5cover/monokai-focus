@@ -1,4 +1,4 @@
-# name
+# Theme compiler
 
 Generate the final theme from a typed inventory of known scopes, rather than hand-authoring selectors directly.
 
@@ -41,40 +41,21 @@ Adding a way to group by atom, (a special submap under keyword) is very tempting
 
 set of known scopes stacks (with languages) that represent the core and must be styled correctly.
 
-example for JSON
-
-```js
-{
-  "source.json": {
-    suffix: 'json' // shared suffix of all children, that need not be specified in stylemaps. eg real scope is "meta.structure.array.json"
-    children: {
-      "meta.structure.array": {
-        title: "array",
-        children: {
-          "punctuation.definition.array.begin": {
-            title: 'begin',
-            match: "\\["
-          },
-          "punctuation.definition.array.end": {
-            title: 'end',
-            match: "\\]"
-          },
-          "punctuation.separator.array": {
-            on: ","
-          },
-          "invalid.illegal.expected-array-separator": {
-            match: "[^\\s\\]]"
-          }
-        }
-      },
-    }
-  }
-}
+```ts
+type KnownScope =
+    | KnownScope[]
+    | ({
+          scope: string
+          title?: string
+          description?: string
+      } & ({ on: Matcher | Matcher[]; children?: KnownScope } | { children: KnownScope }))
+type Matcher = MatcherAtom | { begin: MatcherAtom; end: MatcherAtom }
+type MatcherAtom = string | { pattern: string; group: number | string }
 ```
 
 match/on/title are used to remember what the scope is and where it appears. For JSON schema conversion:
 
-- title = space-sep concatenatation of json title of each parent from root to deepest. for each element title = title ?? description ?? on
+- title = space-sep concatenatation of json title of each parent from root to deepest. for each element title = title ?? description
 - description = (title ? {on}\n{description} : description ? on : null)
 
 to stringify on:
@@ -82,11 +63,18 @@ to stringify on:
 - if it's a string wrap in backticks: `` `${on}` ``
 - if it's begin/end: `` `${begin}`...`${end}` ``
 - if it's an array: wrap in parens is parent is a begin/end, join each alternative by `|`
-- if it's a { pattern, group }: `` `${pattern.toString()}`\$${group} ``. omit the group part if group === 0. normalize regex to string if it contains no qualifiers or groups and group is 0.
+- if it's a { pattern, group }: `` `${pattern.toString()}`\$${group} ``. omit the group part if group === 0.
+- proper ```text``` codeblock and newline handling if text/pattern contains \r?\n
 
 ### stylemap
 
 Either partial or total depending on strictness
+
+Top stylemap type:
+
+```ts
+type Stylemap = Record<string, Stylemap | string>
+```
 
 ### options
 
@@ -108,8 +96,19 @@ compile({
 
 general algorithm:
 
+findScopes
+
 1. Parse scope grammars into scope set with findScopes
-2. Generate JSON schema and optionally TypeScript type from scope universe.
+
+genSchema
+
+1. Generate JSON schema and optionally TypeScript type from scope universe.
+
+compile
+
+1. Group scopes by style
+2. Generalize scopes
+   1.
 
 ## Output:
 

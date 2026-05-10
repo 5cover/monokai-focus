@@ -1,4 +1,4 @@
-import { any, r, type Rule } from '../../scripts/decleme.ts'
+import { any, r, type Rule } from '../decleme.ts'
 
 export default [
     r('meta', { on: any('keyword.control.at-rule', 'keyword.operator.logical.and.media.css') }),

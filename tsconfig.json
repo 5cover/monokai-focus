@@ -2,7 +2,7 @@
   "compilerOptions": {
     "module": "nodenext",
     "allowImportingTsExtensions": true,
-    "noEmit": true,
+    "rewriteRelativeImportExtensions": true,
     "checkJs": false,
     "experimentalDecorators": false,
     "strictNullChecks": true,
@@ -10,14 +10,16 @@
     "strict": true,
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": true,
+    "sourceMap": true,
     "types": [
       "node",
       "json-schema"
-    ]
+    ],
+    "rootDir": "src",
+    "outDir": "dist"
   },
   "include": [
-    "scripts/**/*.ts",
-    "src/**/*.ts"
+    "src",
   ],
   "exclude": [
     "demo",

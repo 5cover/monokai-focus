@@ -1,4 +1,4 @@
-import { r } from '../../../scripts/decleme.ts'
+import { r } from '../../decleme.ts'
 
 export default [
     r('dim', {

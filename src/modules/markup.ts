@@ -1,4 +1,4 @@
-import { any, cross, r, type Rule } from '../../scripts/decleme.ts'
+import { any, cross, r, type Rule } from '../decleme.ts'
 
 export default [
     r('abstraction', {

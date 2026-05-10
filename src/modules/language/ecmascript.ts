@@ -1,4 +1,4 @@
-import { any, c, r, type Scope } from '../../../scripts/decleme.ts'
+import { any, c, r, type Scope } from '../../decleme.ts'
 
 const s = (s: Scope) => [s, 'tsx:jsx:js:ts']
 
