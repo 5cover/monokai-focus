@@ -12,7 +12,6 @@ export default [
     r('text', {
         on: 'string',
         no: any(
-            'variable',
             c('meta.object-literal.key', 'string'),
             c(
                 'string',

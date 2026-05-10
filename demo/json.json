@@ -1,9 +1,5 @@
 {
-  "env": {
-    "es6": true,
-    "mocha": false,
-    "node": null
-  },
+  "env": [[{"a":[]}]],
   "extends": "eslint:recommended",
   "rules": {
     "indent": ["error", 2],

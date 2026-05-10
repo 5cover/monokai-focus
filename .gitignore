@@ -2,3 +2,5 @@ node_modules
 *.vsix
 .env
 dist/
+*.generated.*
+generated/

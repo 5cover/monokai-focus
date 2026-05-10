@@ -5,6 +5,7 @@
     "rewriteRelativeImportExtensions": true,
     "checkJs": false,
     "experimentalDecorators": false,
+    "declaration": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
     "strict": true,
@@ -12,14 +13,13 @@
     "verbatimModuleSyntax": true,
     "sourceMap": true,
     "types": [
-      "node",
-      "json-schema"
+      "node"
     ],
-    "rootDir": "src",
+    "rootDir": "generator",
     "outDir": "dist"
   },
   "include": [
-    "src",
+    "generator",
   ],
   "exclude": [
     "demo",

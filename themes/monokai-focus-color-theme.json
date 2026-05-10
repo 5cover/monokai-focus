@@ -476,8 +476,7 @@
         "string punctuation.definition.subshell",
         "string punctuation.definition.template-expression",
         "string punctuation.definition.variable",
-        "string punctuation.section.embedded",
-        "variable"
+        "string punctuation.section.embedded"
       ],
       "settings": {
         "foreground": "#F8F8F2"
