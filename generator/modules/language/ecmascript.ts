@@ -1,16 +1,15 @@
-import { any, c, r, type Scope } from '../../decleme.ts'
+import { any, c, language, r } from '../../decleme.ts'
 
-const s = (s: Scope) => [s, 'tsx:jsx:js:ts']
-
-export default [
-    r('type', { on: c(s('meta.type.annotation'), 'storage.modifier') }),
-    r('langvar', { on: s('variable.language.super:this:arguments') }),
-    r('abstraction', { on: s('keyword.control.require') }),
+export default language(
+    'tsx:ts:js:jsx',
+    r('type', { on: c('meta.type.annotation', 'storage.modifier') }),
+    r('langvar', { on: 'variable.language.super:this:arguments' }),
+    r('abstraction', { on: 'keyword.control.require' }),
     r('declaration', {
         on: any(
-            s('constant.language.import-export-all'),
-            c(s('source'), 'meta.import:import-equals:external:export', 'keyword.control'),
+            'constant.language.import-export-all',
+            c('source', 'meta.import:import-equals:external:export', 'keyword.control'),
         ),
-        no: s('storage.type.function.arrow'),
+        no: 'storage.type.function.arrow',
     }),
-]
+)

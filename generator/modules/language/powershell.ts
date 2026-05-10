@@ -1,7 +1,8 @@
-import { r } from '../../decleme.ts'
+import { language, r } from '../../decleme.ts'
 
-export default [
+export default language(
+    'powershell',
     r('instruction', {
-        on: 'keyword.control.powershell',
+        on: 'keyword.control',
     }),
-]
+)

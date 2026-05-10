@@ -55,10 +55,10 @@ r(styleKey, { on, no })
 Creates the same binding, then creates positive reset rules for excluded contexts.
 
 ```ts
-cross(...rules)
+unordered(...rules)
 ```
 
-Creates independent rules plus every cross-product of their selectors and merged styles. This is useful for styles that can overlap without lexical nesting in the authoring source, such as markdown bold and italic.
+Creates independent rules plus every unordered-product of their selectors and merged styles. This is useful for styles that can overlap without lexical nesting in the authoring source, such as markdown bold and italic.
 
 ```ts
 c(...parts)
@@ -105,7 +105,7 @@ Style fields compile as follows:
 
 Rule identity is the style key, not `Style.name`. `name` is display metadata for the generated token-color entry.
 
-When multiple styles are merged by `cross`, later resolved styles override `fg`, `fontFamily`, `fontSize`, and `lineHeight`. Font styles are unioned unless a later style has `in: []`, which clears the accumulated font style. Merged rule names are joined from display names.
+When multiple styles are merged by `unordered`, later resolved styles override `fg`, `fontFamily`, `fontSize`, and `lineHeight`. Font styles are unioned unless a later style has `in: []`, which clears the accumulated font style. Merged rule names are joined from display names.
 
 ## Selector Values
 
@@ -200,12 +200,12 @@ meta.import keyword.control.as
 
 Alternatives are flattened, sorted, and deduplicated within a compiled rule.
 
-## Cross Rules
+## Unordere Rules
 
-`cross` emits each base rule and all merged selector combinations:
+`unordered` emits each base rule and all merged selector combinations:
 
 ```ts
-cross(
+unordered(
     r('emphasis', { on: 'markup.italic' }),
     r('strong', { on: 'markup.bold' }),
 )

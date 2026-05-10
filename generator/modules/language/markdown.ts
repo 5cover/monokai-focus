@@ -1,7 +1,8 @@
-import { any, r } from '../../decleme.ts'
+import { any, language, r } from '../../decleme.ts'
 
-export default [
+export default language(
+    'markdown',
     r('declaration', {
-        on: any('meta.separator.markdown', 'punctuation.definition.list.begin.markdown'),
+        on: any('meta.separator', 'punctuation.definition.list.begin'),
     }),
-]
+)

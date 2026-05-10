@@ -1,7 +1,8 @@
-import { r } from '../../decleme.ts'
+import { language, r } from '../../decleme.ts'
 
-export default [
+export default language(
+    'yaml',
     r('type', {
-        no: 'entity.name.tag.yaml',
+        no: 'entity.name.tag',
     }),
-]
+)

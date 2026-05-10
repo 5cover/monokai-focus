@@ -1,7 +1,8 @@
-import { r } from '../../decleme.ts'
+import { language, r } from '../../decleme.ts'
 
-export default [
+export default language(
+    'cpp',
     r('dim', {
-        on: 'punctuation.separator.namespace.access.cpp',
+        on: 'punctuation.separator.namespace.access',
     }),
-]
+)

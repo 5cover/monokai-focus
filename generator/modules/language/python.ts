@@ -1,10 +1,11 @@
-import { c, r } from '../../decleme.ts'
+import { c, language, r } from '../../decleme.ts'
 
-export default [
+export default language(
+    'python',
     r('operation', {
-        on: 'keyword.operator.logical.python',
+        on: 'keyword.operator.logical',
     }),
     r('abstraction', {
-        on: c('meta.function.decorator.python', 'support.type.python'),
+        on: c('meta.function.decorator', 'support.type'),
     }),
-]
+)

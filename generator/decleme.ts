@@ -15,7 +15,7 @@ export type Style = {
 
 export type Scope = string | readonly Scope[] | AnySelector | DescendingSelector
 
-export type Rule = TokenRule | CrossRule
+export type Rule = TokenRule | UnorderedRule
 
 export type TokenRule = {
     type: 'rule'
@@ -29,8 +29,8 @@ export type RuleOptions = {
     no?: Scope
 }
 
-export type CrossRule = {
-    type: 'cross'
+export type UnorderedRule = {
+    type: 'unordered'
     rules: readonly TokenRule[]
 }
 
@@ -50,6 +50,19 @@ export type CompileOptions = {
     defaultFontSize?: number
     defaultLineHeight?: number
 }
+
+export function language(scopeName: string, ...rules: Rule[]): Rule[] {
+    return rules.map(u =>
+        u.type === 'rule' ? suffixRule(scopeName, u) : unordered(...u.rules.map(u => suffixRule(scopeName, u))),
+    )
+}
+function suffixRule(by: string, u: TokenRule) {
+    return r(u.style, {
+        on: u.on === undefined ? undefined : [u.on, by],
+        no: u.no === undefined ? undefined : [u.no, by],
+    })
+}
+
 export function semantic(style: Pick<Style, 'fg' | 'in'>): TokenStylingStyle {
     return (
             style.fg !== undefined &&
@@ -76,9 +89,9 @@ export function c(...parts: Scope[]): DescendingSelector {
     return { type: 'c', parts }
 }
 
-export function cross(...rules: TokenRule[]): CrossRule {
-    if (rules.length < 2) console.error('warning: cross called with', rules.length, 'rules')
-    return { type: 'cross', rules }
+export function unordered(...rules: TokenRule[]): UnorderedRule {
+    if (rules.length < 2) console.error('warning: undordered called with', rules.length, 'rules')
+    return { type: 'unordered', rules }
 }
 
 export function compileTokenColors(rules: readonly Rule[], options: CompileOptions = {}): TextMateTokenColor[] {
@@ -96,7 +109,7 @@ function mergeRules(rules: readonly Rule[]): Rule[] {
     const mergedByStyle = new Map<StyleKey, TokenRule>()
 
     for (const item of rules) {
-        if (item.type === 'cross') {
+        if (item.type === 'unordered') {
             mergedRules.push(item)
             continue
         }
@@ -121,7 +134,7 @@ function combineOptionalScopes(left: Scope | undefined, right: Scope | undefined
 }
 
 function compileRule(item: Rule, options: CompileOptions): TextMateTokenColor[] {
-    if (item.type === 'cross') return compileCross(item, options)
+    if (item.type === 'unordered') return compileUnordered(item, options)
     return compileTokenRule(item, options)
 }
 
@@ -141,7 +154,7 @@ function compileTokenRule(item: TokenRule, options: CompileOptions): TextMateTok
     return compiled
 }
 
-function compileCross(item: CrossRule, options: CompileOptions): TextMateTokenColor[] {
+function compileUnordered(item: UnorderedRule, options: CompileOptions): TextMateTokenColor[] {
     const base = item.rules.flatMap(item => compileTokenRule(item, options))
     const combinations: TextMateTokenColor[] = []
 

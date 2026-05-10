@@ -1,4 +1,4 @@
-import { any, cross, r, type Rule } from '../decleme.ts'
+import { any, unordered, r, type Rule } from '../decleme.ts'
 
 export default [
     r('abstraction', {
@@ -8,7 +8,7 @@ export default [
         on: any('entity.name.tag', 'punctuation.definition.tag'),
     }),
     r('text', { on: any('markup.raw', 'markup.inline.raw') }),
-    cross(
+    unordered(
         r('emphasis', { on: 'markup.italic' }),
         r('strong', { on: 'markup.bold' }),
         r('quote', { on: 'markup.quote' }),

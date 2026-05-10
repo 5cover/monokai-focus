@@ -1,7 +1,8 @@
-import { r } from '../../decleme.ts'
+import { language, r } from '../../decleme.ts'
 
-export default [
+export default language(
+    'cs',
     r('meta', {
-        on: 'punctuation.separator.hash.cs',
+        on: 'punctuation.separator.hash',
     }),
-]
+)
