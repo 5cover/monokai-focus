@@ -1,4 +1,4 @@
-import { c, language, r } from '../../decleme.ts'
+import { language, r } from '../../decleme.ts'
 
 export default language(
     'python',

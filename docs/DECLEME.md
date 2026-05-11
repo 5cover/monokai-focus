@@ -61,7 +61,7 @@ unordered(...rules)
 Creates independent rules plus every unordered-product of their selectors and merged styles. This is useful for styles that can overlap without lexical nesting in the authoring source, such as markdown bold and italic.
 
 ```ts
-c(...parts)
+desc(...parts)
 ```
 
 Creates an ancestor selector. The parts are joined by spaces after expansion.
@@ -167,10 +167,10 @@ Colon alternatives are local to their dot segment. Cross-products are produced w
 
 ## Ancestor Selectors
 
-`c(...parts)` creates hierarchical nesting:
+`desc(...parts)` creates hierarchical nesting:
 
 ```ts
-c('meta.import', 'keyword.control.as:from')
+desc('meta.import', 'keyword.control.as:from')
 ```
 
 expands to:
@@ -181,6 +181,12 @@ meta.import keyword.control.from
 ```
 
 The final scope segment is the target token scope in VS Code's TextMate matching grammar. Earlier segments are parent scopes.
+
+For simple selectors, the space can be used:
+
+```ts
+'meta.import keyword.control.as:from'
+```
 
 ## Alternatives
 

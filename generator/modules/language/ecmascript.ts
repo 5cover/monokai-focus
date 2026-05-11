@@ -1,4 +1,4 @@
-import { any, c, language, r } from '../../decleme.ts'
+import { any, language, r } from '../../decleme.ts'
 
 export default language(
     'tsx:ts:js:jsx',

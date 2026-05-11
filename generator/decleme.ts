@@ -1,6 +1,7 @@
 import type { ColorInstance } from 'color'
 import { styles, type StyleKey } from './styles.ts'
 import type { TextMateSettings, TextMateTokenColor, TokenStylingStyle } from './types.ts'
+import { fjoin, fsplit } from './util.ts'
 
 export type FontStyle = 'italic' | 'bold' | 'underline' | 'strikethrough'
 
@@ -84,7 +85,7 @@ export function any(...parts: Scope[]): AnySelector {
     return { type: 'any', parts }
 }
 
-export function c(...parts: Scope[]): DescendingSelector {
+export function desc(...parts: Scope[]): DescendingSelector {
     if (parts.length < 1) console.error('warning: c called with', parts.length, 'parts')
     return { type: 'c', parts }
 }
@@ -252,10 +253,10 @@ function toFontStyleArray(value: Style['in']): FontStyle[] {
 function expandScope(scope: Scope): string[] {
     if (typeof scope === 'string') return expandString(scope)
     if (isArray(scope)) {
-        return cartesian(scope.map(expandScope)).map(fjoin('.').$)
+        return cartesian(scope.map(expandScope)).map(fjoin('.'))
     }
     if (scope.type === 'any') return scope.parts.flatMap(expandScope)
-    return cartesian(scope.parts.map(expandScope)).map(fjoin(' ').$)
+    return cartesian(scope.parts.map(expandScope)).map(fjoin(' '))
 }
 
 function isArray(arr: unknown): arr is readonly unknown[] {
@@ -263,10 +264,15 @@ function isArray(arr: unknown): arr is readonly unknown[] {
 }
 
 const expand = {
-    split: fsplit(':')('.')(' ').$,
-    join: fjoin('.')(' ').$,
+    split: fsplit(':', '.', ' '),
+    join: fjoin(' ', '.'),
 }
 function expandString(s: string): string[] {
+    console.log(
+        s,
+        expand.split(s),
+        expand.split(s).map(set => expand.join(cartesian(set))),
+    )
     return expand.split(s).map(set => expand.join(cartesian(set)))
 }
 
@@ -291,53 +297,4 @@ function permutations<T>(items: readonly T[]): T[][] {
 
 function uniqueSorted(items: readonly string[]): string[] {
     return [...new Set(items)].sort()
-}
-
-type FJoin<T> = {
-    $: (value: T[]) => string;
-    (sep: string): FJoin<T[]>
-}
-
-type FSplit<T> = {
-    $: (value: string) => T[];
-    (sep: string): FSplit<T[]>
-}
-
-function fjoin<T = string>(sep: string): FJoin<T> {
-    return makeJoin<T>([sep])
-}
-
-function makeJoin<T>(seps: string[]): FJoin<T> {
-    const fn = ((sep: string) => makeJoin<T[]>([...seps, sep])) as FJoin<T>
-    fn.$ = (value: T[]) => joinWith(seps, value)
-    return fn
-}
-
-function joinWith(seps: string[], value: unknown): string {
-    const [sep, ...rest] = seps
-    if (rest.length === 0) {
-        return (value as unknown[]).filter(Boolean).join(sep)
-    }
-    return (value as unknown[])
-        .filter(Boolean)
-        .map(item => joinWith(rest, item))
-        .join(sep)
-}
-
-function fsplit(sep: string): FSplit<string> {
-    return makeSplit<string>([sep])
-}
-
-function makeSplit<T>(seps: string[]): FSplit<T> {
-    const fn = ((sep: string) => makeSplit<T[]>([...seps, sep])) as FSplit<T>
-    fn.$ = (value: string) => splitWith(seps, value) as T[]
-    return fn
-}
-
-function splitWith(seps: string[], value: string): unknown[] {
-    const [sep, ...rest] = seps
-    if (rest.length === 0) {
-        return value.split(sep)
-    }
-    return value.split(sep).map(part => splitWith(rest, part))
 }

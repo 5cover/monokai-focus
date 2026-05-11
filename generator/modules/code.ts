@@ -1,4 +1,4 @@
-import { any, c, r, type Rule } from '../decleme.ts'
+import { any, desc, r, type Rule } from '../decleme.ts'
 
 export default [
     r('parameter', { on: 'variable.parameter' }),
@@ -20,7 +20,7 @@ export default [
             'entity.name.type.class',
             'support.class',
             'punctuation.decorator',
-            c('meta.decorator', 'variable.other.readwrite'),
+            'meta.decorator variable.other.readwrite',
         ),
     }),
     r('declaration', {

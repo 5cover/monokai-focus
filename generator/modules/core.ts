@@ -1,4 +1,4 @@
-import { any, c, r, type Rule } from '../decleme.ts'
+import { any, desc, r, type Rule } from '../decleme.ts'
 
 export default [
     r('illegal', { on: 'invalid.illegal' }),
@@ -12,8 +12,8 @@ export default [
     r('text', {
         on: 'string',
         no: any(
-            c('meta.object-literal.key', 'string'),
-            c(
+            'meta.object-literal.key string',
+            desc(
                 'string',
                 any(
                     'punctuation.definition.template-expression:subshell:variable',
