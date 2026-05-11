@@ -65,15 +65,12 @@ function suffixRule(by: string, u: TokenRule) {
 }
 
 export function semantic(style: Pick<Style, 'fg' | 'in'>): TokenStylingStyle {
-    return (
-            style.fg !== undefined &&
-                (style.in === undefined || (typeof style.in !== 'string' && style.in.length === 0))
-        ) ?
-            style.fg
-        :   {
-                foreground: style.fg,
-                fontStyle: isArray(style.in) ? style.in.toSorted().join(' ') : style.in,
-            }
+    return style.fg !== undefined && (style.in === undefined || (typeof style.in !== 'string' && style.in.length === 0))
+        ? style.fg
+        : {
+              foreground: style.fg,
+              fontStyle: isArray(style.in) ? style.in.toSorted().join(' ') : style.in,
+          }
 }
 
 export function r(style: StyleKey, options: RuleOptions): TokenRule {
@@ -98,11 +95,7 @@ export function unordered(...rules: TokenRule[]): UnorderedRule {
 export function compileTokenColors(rules: readonly Rule[], options: CompileOptions = {}): TextMateTokenColor[] {
     return mergeRules(rules)
         .flatMap(item => compileRule(item, options))
-        .sort(({ name: a }, { name: b }) =>
-            a === b ? 0
-            : a === undefined || (b !== undefined && a < b) ? -1
-            : 1,
-        )
+        .sort(({ name: a }, { name: b }) => (a === b ? 0 : a === undefined || (b !== undefined && a < b) ? -1 : 1))
 }
 
 function mergeRules(rules: readonly Rule[]): Rule[] {
@@ -264,18 +257,16 @@ function isArray(arr: unknown): arr is readonly unknown[] {
 }
 
 const expand = {
-    split: fsplit(':', '.', ' '),
-    join: fjoin(' ', '.'),
+    split: fsplit('.', ' ', ':'),
+    join: fjoin('.', ' '),
 }
 function expandString(s: string): string[] {
-    console.log(
-        s,
-        expand.split(s),
-        expand.split(s).map(set => expand.join(cartesian(set))),
-    )
-    return expand.split(s).map(set => expand.join(cartesian(set)))
+    return cartesian3(expand.split(s)).map(expand.join)
 }
 
+function cartesian3<T>(sets: readonly (readonly (readonly T[])[])[]): T[][][] {
+    return cartesian(sets.map(group => cartesian(group)))
+}
 function cartesian<T>(sets: readonly (readonly T[])[]): T[][] {
     return sets.reduce<T[][]>((rows, set) => rows.flatMap(row => set.map(item => [...row, item])), [[]])
 }
