@@ -1,4 +1,4 @@
-import { any, desc, r, type Rule } from '../decleme.ts'
+import { any, r, type Rule } from '../decleme.ts'
 
 export default [
     r('parameter', { on: 'variable.parameter' }),
@@ -37,14 +37,19 @@ export default [
                 'control.switch:conditional:trycatch:as:satisfies:loop:if:elif:then:fi',
                 [
                     'operator',
-                    any('type.asserts', 'expression.typeof:in:instanceof:void:of:keyof:as:infer:is', 'expression:.new'),
+                    any(
+                        'new',
+                        'type.asserts',
+                        'expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
+                        'expression:.new',
+                    ),
                 ],
                 'other.new',
             ),
         ]),
     }),
     r('instruction', {
-        on: ['keyword', any('other.debugger', 'control.:flow:with:return', 'operator.expression.delete:await')],
+        on: ['keyword', any('other.debugger', 'control.flow:with:return', 'operator.expression.delete:await')],
     }),
     r('dim', { on: 'punctuation.accessor', no: 'punctuation.accessor.optional' }),
     r('meta', { on: any('keyword.control.directive', 'entity.name.function.preprocessor', 'keyword.preprocessor') }),

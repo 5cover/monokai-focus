@@ -87,6 +87,9 @@ export = require();
 export = {"a":1}
 export default { }
 
+export type FontStyle = 'italic' | 'bold' | 'underline' | 'strikethrough'
+export interface A { }
+
 {
     const a = { get f() { }, set g() { ; } }
 }
