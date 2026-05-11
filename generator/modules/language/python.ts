@@ -6,6 +6,6 @@ export default language(
         on: 'keyword.operator.logical',
     }),
     r('abstraction', {
-        on: c('meta.function.decorator', 'support.type'),
+        on: 'meta.function.decorator support.type',
     }),
 )
