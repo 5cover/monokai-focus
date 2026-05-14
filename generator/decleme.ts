@@ -14,20 +14,21 @@ export type Style = {
     lineHeight?: number
 }
 
-export type Scope = string | readonly Scope[] | AnySelector | DescendingSelector
+export type Scope = string
+export type Selector = Scope | readonly Selector[] | AnySelector | DescendingSelector
 
 export type Rule = TokenRule | UnorderedRule
 
 export type TokenRule = {
     type: 'rule'
     style: StyleKey
-    on?: Scope
-    no?: Scope
+    on?: Selector
+    no?: Selector
 }
 
 export type RuleOptions = {
-    on?: Scope
-    no?: Scope
+    on?: Selector
+    no?: Selector
 }
 
 export type UnorderedRule = {
@@ -37,12 +38,12 @@ export type UnorderedRule = {
 
 export type AnySelector = {
     type: 'any'
-    parts: readonly Scope[]
+    parts: readonly Selector[]
 }
 
 export type DescendingSelector = {
     type: 'c'
-    parts: readonly Scope[]
+    parts: readonly Selector[]
 }
 
 export type CompileOptions = {
@@ -52,7 +53,7 @@ export type CompileOptions = {
     defaultLineHeight?: number
 }
 
-export function language(scopeName: string, ...rules: Rule[]): Rule[] {
+export function language(scopeName: Scope, ...rules: Rule[]): Rule[] {
     return rules.map(u =>
         u.type === 'rule' ? suffixRule(scopeName, u) : unordered(...u.rules.map(u => suffixRule(scopeName, u))),
     )
@@ -77,12 +78,12 @@ export function r(style: StyleKey, options: RuleOptions): TokenRule {
     return { type: 'rule', style, on: options.on, no: options.no }
 }
 
-export function any(...parts: Scope[]): AnySelector {
+export function any(...parts: Selector[]): AnySelector {
     if (parts.length < 1) console.error('warning: any called with', parts.length, 'parts')
     return { type: 'any', parts }
 }
 
-export function desc(...parts: Scope[]): DescendingSelector {
+export function desc(...parts: Selector[]): DescendingSelector {
     if (parts.length < 1) console.error('warning: c called with', parts.length, 'parts')
     return { type: 'c', parts }
 }
@@ -110,8 +111,8 @@ function mergeRules(rules: readonly Rule[]): Rule[] {
 
         const existing = mergedByStyle.get(item.style)
         if (existing) {
-            existing.on = combineOptionalScopes(existing.on, item.on)
-            existing.no = combineOptionalScopes(existing.no, item.no)
+            existing.on = combineOptional(existing.on, item.on)
+            existing.no = combineOptional(existing.no, item.no)
         } else {
             const merged = { ...item }
             mergedByStyle.set(item.style, merged)
@@ -122,7 +123,7 @@ function mergeRules(rules: readonly Rule[]): Rule[] {
     return mergedRules
 }
 
-function combineOptionalScopes(left: Scope | undefined, right: Scope | undefined): Scope | undefined {
+function combineOptional(left: Selector | undefined, right: Selector | undefined): Selector | undefined {
     if (left && right) return any(left, right)
     return left ?? right
 }
@@ -134,14 +135,14 @@ function compileRule(item: Rule, options: CompileOptions): TextMateTokenColor[] 
 
 function compileTokenRule(item: TokenRule, options: CompileOptions): TextMateTokenColor[] {
     const style = resolveStyle(item.style)
-    const scopes = item.on ? uniqueSorted(expandScope(item.on)) : []
+    const scopes = item.on ? uniqueSorted(expandScopes(item.on)) : []
     const compiled: TextMateTokenColor[] = [toTokenColor(style, scopes)]
     if (scopes.length === 0) {
         console.log('warning: empty rule: ', item)
     }
     if (item.no) {
         const resetStyle = invertStyle(style, options)
-        const resetScopes = uniqueSorted(expandScope(item.no))
+        const resetScopes = uniqueSorted(expandScopes(item.no))
         compiled.push(toTokenColor({ ...resetStyle, name: `${style.name ?? item.style}.reset` }, resetScopes))
     }
 
@@ -161,7 +162,9 @@ function compileUnordered(item: UnorderedRule, options: CompileOptions): TextMat
             const orders = permutations(group)
             const scopes = uniqueSorted(
                 orders.flatMap(ordered =>
-                    cartesian(ordered.map(item => (item.on ? expandScope(item.on) : []))).map(parts => parts.join(' ')),
+                    cartesian(ordered.map(item => (item.on ? expandScopes(item.on) : []))).map(parts =>
+                        parts.join(' '),
+                    ),
                 ),
             )
             combinations.push(toTokenColor(style, scopes))
@@ -183,7 +186,7 @@ function resolveStyle(style: StyleKey): Style {
     return styles[style]
 }
 
-function toTokenColor(style: Style, scopes: readonly string[]): TextMateTokenColor {
+function toTokenColor(style: Style, scopes: readonly Scope[]): TextMateTokenColor {
     return {
         ...(style.name ? { name: style.name } : {}),
         scope: scopes.length === 1 ? scopes[0] : [...scopes],
@@ -243,13 +246,13 @@ function toFontStyleArray(value: Style['in']): FontStyle[] {
     return typeof value === 'string' ? [value] : [...value]
 }
 
-function expandScope(scope: Scope): string[] {
+function expandScopes(scope: Selector): Scope[] {
     if (typeof scope === 'string') return expandString(scope)
     if (isArray(scope)) {
-        return cartesian(scope.map(expandScope)).map(fjoin('.'))
+        return cartesian(scope.map(expandScopes)).map(fjoin('.'))
     }
-    if (scope.type === 'any') return scope.parts.flatMap(expandScope)
-    return cartesian(scope.parts.map(expandScope)).map(fjoin(' '))
+    if (scope.type === 'any') return scope.parts.flatMap(expandScopes)
+    return cartesian(scope.parts.map(expandScopes)).map(fjoin(' '))
 }
 
 function isArray(arr: unknown): arr is readonly unknown[] {
@@ -286,6 +289,6 @@ function permutations<T>(items: readonly T[]): T[][] {
     })
 }
 
-function uniqueSorted(items: readonly string[]): string[] {
+function uniqueSorted<T extends string>(items: readonly T[]): T[] {
     return [...new Set(items)].sort()
 }

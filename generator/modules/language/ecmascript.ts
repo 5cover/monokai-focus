@@ -7,10 +7,12 @@ export default language(
     r('abstraction', { on: 'keyword.control.require' }),
     r('declaration', {
         on: any(
-            'keyword.control.as:from',
             'constant.language.import-export-all',
+            'keyword.control.as:from',
             'keyword.control.import:export',
+            'keyword.type',
             'meta.export:import:import-equals keyword.control.default',
+            'storage.type:modifier',
         ),
         no: 'storage.type.function.arrow',
     }),

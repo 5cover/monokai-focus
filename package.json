@@ -2,7 +2,7 @@
   "name": "monokai-focus",
   "displayName": "Monokai Focus",
   "description": "A semantics-driven theme that minimizes visual noise by using color and typography only where they meaningfully disambiguate code.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "vscode": "^1.14.0"
   },

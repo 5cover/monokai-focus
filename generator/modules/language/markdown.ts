@@ -5,4 +5,5 @@ export default language(
     r('declaration', {
         on: any('meta.separator', 'punctuation.definition.list.begin'),
     }),
+    r(null, 'keyword.operator'),
 )

@@ -30,9 +30,7 @@ Difficulty is
   - combinatorial structures (markdown bold + italic)
   - this requires adding more rules than necessary
 
-Objective: define a minimal map from scope => style
+Objective: define a minimal map from selector => style
 Compiler builds theme file
 
-The primitive: binding. A scope => style association that is always effective. The compiler must errors in case of conflict between two bindings.
-
-See <DECLEME.md>
+The primitive: the binding. A style => style association. The compiler must errors in case of conflict between two bindings.
