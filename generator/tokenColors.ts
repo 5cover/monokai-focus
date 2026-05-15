@@ -10,6 +10,7 @@ import markdown from './modules/language/markdown.ts'
 import ecmascript from './modules/language/ecmascript.ts'
 import cpp from './modules/language/cpp.ts'
 import go from './modules/language/go.ts'
+import ini from './modules/language/ini.ts'
 
 export default [
     ...core,
@@ -24,4 +25,5 @@ export default [
     ...ecmascript,
     ...cpp,
     ...go,
+    ...ini,
 ]

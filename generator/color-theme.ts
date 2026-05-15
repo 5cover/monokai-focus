@@ -27,7 +27,13 @@ console.table(
 const theme = {
     semanticHighlighting: true,
     semanticTokenColors,
-    tokenColors: compileTokenColors(tokenColors, { defaultForeground: colors.fg }),
+    tokenColors: compileTokenColors(tokenColors, {
+        unstyle: {
+            name: 'unstyled',
+            fg: colors.fg,
+            in: '',
+        },
+    }),
     type: 'dark',
     colors: {
         'activityBar.background': colors.bg,
@@ -130,7 +136,6 @@ const theme = {
         'widget.shadow': '#00000098',
     },
 }
-
 writeFileSync(
     join(import.meta.dirname, '../themes/monokai-focus-color-theme.json'),
     JSON.stringify(theme, (_, v) =>

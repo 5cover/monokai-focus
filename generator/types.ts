@@ -79,7 +79,7 @@ export type TextMateTokenColor = {
     /**
      * Scope selector against which this rule matches.
      */
-    scope?: string | string[]
+    scope?: string | readonly string[]
     settings: TextMateSettings
 }
 
@@ -99,7 +99,3 @@ export type TextMateSettings = {
     fontSize?: number
     lineHeight?: number
 }
-
-import { Stylemap as BaseStylemap } from 'decleme'
-
-export type Stylemap = BaseStylemap<{ color: ColorInstance }>

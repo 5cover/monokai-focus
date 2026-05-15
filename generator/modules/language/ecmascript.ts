@@ -1,19 +1,19 @@
 import { any, language, r } from '../../decleme.ts'
-
+import { style as s } from '../../styles.ts'
 export default language(
     'tsx:ts:js:jsx',
-    r('type', { on: 'meta.type.annotation storage.modifier' }),
-    r('langvar', { on: any('variable.language.super:this:arguments', 'keyword.control.import') }),
-    r('abstraction', { on: 'keyword.control.require' }),
-    r('declaration', {
-        on: any(
-            'constant.language.import-export-all',
-            'keyword.control.as:from',
-            'keyword.control.import:export',
-            'keyword.type',
-            'meta.export:import:import-equals keyword.control.default',
-            'storage.type:modifier',
-        ),
-        no: 'storage.type.function.arrow',
-    }),
+    r(s.type, 'meta.type.annotation storage.modifier'),
+    r(s.langvar, 'variable.language.super:this:arguments', 'keyword.control.import'),
+    r(s.abstraction, 'keyword.control.require'),
+    r(
+        s.declaration,
+        'constant.language.import-export-all',
+        'keyword.control.as:from',
+        'meta.import keyword.control.import',
+        'keyword.control.export',
+        'keyword.type',
+        'meta.export:import:import-equals keyword.control.default',
+        'storage.type:modifier',
+    ),
+    r(null, 'storage.type.function.arrow'),
 )

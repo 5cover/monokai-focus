@@ -18,7 +18,7 @@ export const colors = {
     fg2_5: color('hsl(60, 1%, 53%)'),
 }
 
-export const styles = {
+export const style = {
     /**
      * A named composable unit of logic.
      *
@@ -49,8 +49,7 @@ export const styles = {
      * * export default
      * * get
      * * set
-     * * static
-     * * using
+     * * static* * using
      * * constructor
      *
      * TypeScript
@@ -237,29 +236,27 @@ export const styles = {
     text: { name: 'text', fg: colors.yellow },
 } as const satisfies Record<string, Style>
 
-export type StyleKey = keyof typeof styles
-
 export const semanticTokenColors = {
-    '*.deprecated': s(styles.deprecated),
-    comment: s(styles.comment),
-    decorator: s(styles.abstraction),
-    class: s(styles.abstraction),
-    enum: s(styles.type),
-    interface: s(styles.type),
-    keyword: s(styles.instruction),
-    macro: styles.meta.fg,
-    namespace: s(styles.type),
-    number: s(styles.leaf),
-    operator: s(styles.operation),
-    parameter: s(styles.parameter),
-    regexp: s(styles.text),
-    string: s(styles.text),
-    struct: s(styles.type),
-    type: s(styles.type),
+    '*.deprecated': s(style.deprecated),
+    comment: s(style.comment),
+    decorator: s(style.abstraction),
+    class: s(style.abstraction),
+    enum: s(style.type),
+    interface: s(style.type),
+    keyword: s(style.instruction),
+    macro: style.meta.fg,
+    namespace: s(style.type),
+    number: s(style.leaf),
+    operator: s(style.operation),
+    parameter: s(style.parameter),
+    regexp: s(style.text),
+    string: s(style.text),
+    struct: s(style.type),
+    type: s(style.type),
     typeParameter: {
         fontStyle: 'italic',
-        foreground: styles.type.fg,
+        foreground: style.type.fg,
     },
-    function: s(styles.abstraction),
-    '*.typeHint': s(styles.type),
+    function: s(style.abstraction),
+    '*.typeHint': s(style.type),
 } satisfies TokenStyling

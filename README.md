@@ -34,3 +34,17 @@ Objective: define a minimal map from selector => style
 Compiler builds theme file
 
 The primitive: the binding. A style => style association. The compiler must errors in case of conflict between two bindings.
+
+todo:
+
+- no more resets
+- no more on/no
+- unstyled null stylekey
+- analysis: check no two selectors equivalent
+
+implementation
+
+- compile rule selectors into strings.
+- bin them into `Map<StyleRef, Set<string>>`. if a scope is already in set? error. we build the sets iteratively so we can preserve the context of which rule it corresponded to
+- for unordered : some selectors appear in multiple sets
+- emit the rules and sort them when the set is nonemtpy (accepting a defaultStyle for null).

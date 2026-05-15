@@ -1,19 +1,15 @@
-import { any, unordered, r, type Rule } from '../decleme.ts'
-
+import { unordered, r, type Rule } from '../decleme.ts'
+import { style as s } from '../styles.ts'
 export default [
-    r('abstraction', {
-        on: 'support.class.component',
-    }),
-    r('leaf', {
-        on: any('entity.name.tag', 'punctuation.definition.tag'),
-    }),
-    r('text', { on: any('markup.raw', 'markup.inline.raw') }),
+    r(s.abstraction, 'support.class.component'),
+    r(s.leaf, 'entity.name.tag', 'punctuation.definition.tag'),
+    r(s.text, 'markup.raw', 'markup.inline.raw'),
     unordered(
-        r('emphasis', { on: 'markup.italic' }),
-        r('strong', { on: 'markup.bold' }),
-        r('quote', { on: 'markup.quote' }),
-        r('declaration', { on: 'markup.heading' }),
+        r(s.emphasis, 'markup.italic'),
+        r(s.strong, 'markup.bold'),
+        r(s.quote, 'markup.quote'),
+        r(s.declaration, 'markup.heading'),
     ),
-    r('declaration', { on: 'entity.name.section' }),
-    r('meta', { on: 'punctuation.section.embedded' }),
+    r(s.declaration, 'entity.name.section'),
+    r(s.meta, 'punctuation.section.embedded'),
 ] satisfies Rule[]

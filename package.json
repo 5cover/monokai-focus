@@ -10,7 +10,7 @@
     "Themes"
   ],
   "scripts": {
-    "build": "node generator/color-theme.ts"
+    "build": "tsx generator/color-theme.ts"
   },
   "type": "module",
   "contributes": {
@@ -28,6 +28,7 @@
     "color": "^5.0.3",
     "color-name-list": "^14.37.0",
     "nearest-color": "^0.4.4",
+    "tsx": "^4.22.0",
     "typescript": "^6.0.3"
   },
   "license": "MIT",

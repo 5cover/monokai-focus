@@ -1,27 +1,25 @@
-import { any, desc, r, type Rule } from '../decleme.ts'
+import { any, dsc, r, type Rule } from '../decleme.ts'
+import { style as s } from '../styles.ts'
 
 export default [
-    r('illegal', { on: 'invalid.illegal' }),
-    r('deprecated', { on: 'invalid.deprecated' }),
-    r('comment', { on: 'comment' }),
-    r('documentation', { on: 'comment.:block.documentation' }),
-    r('documentationSyntax', {
-        on: any('storage.type.class.jsdoc', 'constant.string.documentation', 'keyword.other.phpdoc'),
-    }),
-    r('leaf', { on: 'constant' }),
-    r('text', {
-        on: 'string',
-        no: any(
-            'meta.object-literal.key string',
-            desc(
-                'string',
-                any(
-                    'punctuation.definition.template-expression:subshell:variable',
-                    'punctuation.section.embedded',
-                    'meta.template.expression',
-                    'meta.embedded:parameter-expansion',
-                ),
+    r(s.illegal, 'invalid.illegal'),
+    r(s.deprecated, 'invalid.deprecated'),
+    r(s.comment, 'comment'),
+    r(s.documentation, 'comment.:block.documentation'),
+    r(s.documentationSyntax, 'storage.type.class.jsdoc', 'constant.string.documentation', 'keyword.other.phpdoc'),
+    r(s.leaf, 'constant'),
+    r(s.text, 'string'),
+    r(
+        null,
+        'meta.object-literal.key string',
+        dsc(
+            'string',
+            any(
+                'punctuation.definition.template-expression:subshell:variable',
+                'punctuation.section.embedded',
+                'meta.template.expression',
+                'meta.embedded:parameter-expansion',
             ),
         ),
-    }),
+    ),
 ] satisfies Rule[]

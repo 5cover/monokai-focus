@@ -1,11 +1,8 @@
 import { language, r } from '../../decleme.ts'
+import { style as s } from '../../styles.ts'
 
 export default language(
     'python',
-    r('operation', {
-        on: 'keyword.operator.logical',
-    }),
-    r('abstraction', {
-        on: 'meta.function.decorator support.type',
-    }),
+    r(s.operation, 'keyword.operator.logical'),
+    r(s.abstraction, 'meta.function.decorator support.type'),
 )
