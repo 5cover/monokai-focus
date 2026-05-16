@@ -28,12 +28,7 @@ export function isArray(arr: unknown): arr is readonly unknown[] {
     return Array.isArray(arr)
 }
 export type NonEmptyArray<T> = [T, ...T[]]
-export type SoftNonEmptyArray<T> = T | NonEmptyArray<T>
 export type SoftArray<T> = T | T[]
-
-export function nmap<T, U>(arr: NonEmptyArray<T>, map: (item: T) => U) {
-    return arr.map(map) as NonEmptyArray<U>
-}
 
 export function strcmp(a: string, b: string) {
     return (

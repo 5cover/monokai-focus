@@ -2,7 +2,6 @@ import { any, language, r } from '../../decleme.ts'
 import { style as s } from '../../styles.ts'
 export default language(
     'tsx:ts:js:jsx',
-    r(s.type, 'meta.type.annotation storage.modifier'),
     r(s.langvar, 'variable.language.super:this:arguments', 'keyword.control.import'),
     r(s.abstraction, 'keyword.control.require'),
     r(
@@ -13,7 +12,7 @@ export default language(
         'keyword.control.export',
         'keyword.type',
         'meta.export:import:import-equals keyword.control.default',
-        'storage.type:modifier',
+        'storage.type',
     ),
     r(null, 'storage.type.function.arrow'),
 )

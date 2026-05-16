@@ -1,4 +1,4 @@
-import { any, r, type Rule } from '../decleme.ts'
+import { one, r, type Rule } from '../decleme.ts'
 import { style as s } from '../styles.ts'
 
 export default [
@@ -24,20 +24,21 @@ export default [
     ),
     r(
         s.declaration,
-        ['keyword', any('declaration', 'other.typedef:import', 'type.new')],
+        ['keyword', one('declaration', 'other.typedef:import', 'type.new')],
         'punctuation.section.angle-brackets.begin:end.template.definition',
+        'storage.modifier',
     ),
     r(s.operation, [
         'keyword',
-        any(
+        one(
             'control.switch:conditional:trycatch:as:satisfies:loop:if:elif:then:fi',
             [
                 'operator',
-                any(
+                one(
                     'new',
                     'type.asserts',
                     'expression.typeof:in:instanceof:void:of:keyof:as:infer:is',
-                    'expression:.new',
+                    'expression.new',
                 ),
             ],
             'other.new',
@@ -45,8 +46,8 @@ export default [
     ]),
     r(s.instruction, [
         'keyword',
-        any('', 'other.debugger', 'control.flow:with:return', 'operator.expression.delete:await'),
+        one('', 'other.debugger', 'control.flow:with:return', 'operator.expression.delete:await'),
     ]),
     r(s.dim, 'punctuation.accessor'),
-    r(s.meta, any('keyword.control.directive', 'entity.name.function.preprocessor', 'keyword.preprocessor')),
+    r(s.meta, one('keyword.control.directive', 'entity.name.function.preprocessor', 'keyword.preprocessor')),
 ] satisfies Rule[]

@@ -1,4 +1,4 @@
-import { any, dsc, r, type Rule } from '../decleme.ts'
+import { dsc, one, r, type Rule } from '../decleme.ts'
 import { style as s } from '../styles.ts'
 
 export default [
@@ -14,7 +14,7 @@ export default [
         'meta.object-literal.key string',
         dsc(
             'string',
-            any(
+            one(
                 'punctuation.definition.template-expression:subshell:variable',
                 'punctuation.section.embedded',
                 'meta.template.expression',

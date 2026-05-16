@@ -48,27 +48,27 @@ export type TokenStylingStyle =
           /**
            * Foreground color for the token.
            */
-          foreground?: ColorInstance
+          foreground?: ColorInstance | undefined
           /**
            * Sets the all font styles of the rule: 'italic', 'bold', 'underline' or 'strikethrough' or a combination. All styles that are not listed are unset. The empty string unsets all styles.
            */
-          fontStyle?: string
+          fontStyle?: string | undefined
           /**
            * Sets or unsets the font style to bold. Note, the presence of 'fontStyle' overrides this setting.
            */
-          bold?: boolean
+          bold?: boolean | undefined
           /**
            * Sets or unsets the font style to italic. Note, the presence of 'fontStyle' overrides this setting.
            */
-          italic?: boolean
+          italic?: boolean | undefined
           /**
            * Sets or unsets the font style to underline. Note, the presence of 'fontStyle' overrides this setting.
            */
-          underline?: boolean
+          underline?: boolean | undefined
           /**
            * Sets or unsets the font style to strikethrough. Note, the presence of 'fontStyle' overrides this setting.
            */
-          strikethrough?: boolean
+          strikethrough?: boolean | undefined
       }
 
 export type TextMateTokenColor = {
@@ -90,12 +90,12 @@ export type TextMateSettings = {
     /**
      * Foreground color for the token.
      */
-    foreground?: string | ColorInstance
+    foreground?: string | ColorInstance | undefined
     /**
      * Font style of the rule: 'italic', 'bold', 'underline', 'strikethrough' or a combination. The empty string unsets inherited settings.
      */
-    fontStyle?: string
-    fontFamily?: string
-    fontSize?: number
-    lineHeight?: number
+    fontStyle?: string | undefined
+    fontFamily?: string | undefined
+    fontSize?: number | undefined
+    lineHeight?: number | undefined
 }

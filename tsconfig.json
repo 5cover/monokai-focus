@@ -12,6 +12,8 @@
     "allowSyntheticDefaultImports": true,
     "verbatimModuleSyntax": true,
     "sourceMap": true,
+    "exactOptionalPropertyTypes": true,
+    "noEmit": true,
     "types": [
       "node"
     ],

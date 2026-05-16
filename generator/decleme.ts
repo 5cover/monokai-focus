@@ -1,16 +1,6 @@
 import type { ColorInstance } from 'color'
 import type { TextMateSettings, TextMateTokenColor, TokenStylingStyle } from './types.ts'
-import {
-    nmap,
-    fjoin,
-    fsplit,
-    isArray,
-    type Discriminate,
-    type SoftNonEmptyArray,
-    type NonEmptyArray,
-    strcmp,
-    type SoftArray,
-} from './util.ts'
+import { isArray, strcmp, type NonEmptyArray, type SoftArray } from './util.ts'
 
 export type FontStyle = 'italic' | 'bold' | 'underline' | 'strikethrough'
 
@@ -24,9 +14,9 @@ export type Style = {
 }
 
 export type Scope = string
-export type Selector = Scope | readonly Selector[] | Discriminate<Combinators>
-
-export type Rule = TokenRule | UnorderedRule
+export type Selector = null | Scope | readonly Selector[] | Expr
+export type Rule = null | TokenRule | Expr
+type Part = Selector | TokenRule
 
 export type TokenRule = {
     type: 'rule'
@@ -34,14 +24,9 @@ export type TokenRule = {
     selector: Selector
 }
 
-export type UnorderedRule = {
-    type: 'unordered'
-    rules: readonly TokenRule[]
-}
-
-type Combinators = {
-    any: { parts: readonly Selector[] }
-    dsc: { parts: readonly Selector[] }
+export type Expr = {
+    type: 'one' | 'any' | 'dsc' | 'cld'
+    parts: readonly Part[]
 }
 
 export type CompileOptions = {
@@ -49,15 +34,19 @@ export type CompileOptions = {
     unstyle: Style
 }
 
-type StyleInfo = { from: Rule; style: SoftNonEmptyArray<Style | null> }
+type ExpandedRule = { selector: string; styles: NonEmptyArray<Style | null> }
+type Expansion = { selector: string; styles: readonly (Style | null)[] }
+type StyleInfo = { from: Rule; styles: NonEmptyArray<Style | null> }
+
+const defaultOptions: CompileOptions = {
+    unstyle: {
+        name: 'unstyled',
+        in: '',
+    },
+}
 
 export function language(scopeName: Scope, ...rules: Rule[]): Rule[] {
-    return rules.map(u =>
-        u.type === 'rule' ? suffixRule(scopeName, u) : unordered(...u.rules.map(u => suffixRule(scopeName, u))),
-    )
-}
-function suffixRule(by: string, u: TokenRule): TokenRule {
-    return { ...u, type: 'rule', selector: [u.selector, by] }
+    return rules.map(rule => mapRuleSelectors(rule, selector => [selector, scopeName]))
 }
 
 export function semantic(style: Pick<Style, 'fg' | 'in'>): TokenStylingStyle {
@@ -73,178 +62,220 @@ export function semantic(style: Pick<Style, 'fg' | 'in'>): TokenStylingStyle {
 }
 
 export function r(style: Style | null, ...selectors: readonly Selector[]): TokenRule {
-    return { type: 'rule', style, selector: any(...selectors) }
+    return { type: 'rule', style, selector: one(...selectors) }
 }
 
-export function any(...parts: Selector[]): Selector {
+export function one(...parts: readonly Part[]): Expr {
+    if (parts.length < 1) console.error('warning: one called with', parts.length, 'parts')
+    return { type: 'one', parts }
+}
+
+export function any(...parts: readonly Part[]): Expr {
     if (parts.length < 1) console.error('warning: any called with', parts.length, 'parts')
-    return parts.length === 1 ? parts[0] : { type: 'any', parts }
+    return { type: 'any', parts }
 }
 
-export function dsc(...parts: Selector[]): Selector {
-    if (parts.length < 1) console.error('warning: c called with', parts.length, 'parts')
-    return parts.length === 1 ? parts[0] : { type: 'dsc', parts }
+export function dsc(...parts: readonly Part[]): Expr {
+    if (parts.length < 1) console.error('warning: dsc called with', parts.length, 'parts')
+    return { type: 'dsc', parts }
 }
 
-export function unordered(...rules: TokenRule[]): UnorderedRule {
-    if (rules.length < 2) console.error('warning: undordered called with', rules.length, 'rules')
-    return { type: 'unordered', rules }
+export function cld(...parts: readonly Part[]): Expr {
+    if (parts.length < 1) console.error('warning: cld called with', parts.length, 'parts')
+    return { type: 'cld', parts }
 }
-export function compileTokenColors(rules: readonly Rule[], options: CompileOptions) {
+
+export function compileTokenColors(rules: readonly Rule[], options: CompileOptions = defaultOptions) {
     const c = new TokenColorsCompiler(options)
-    const r = c.emitRules(c.compileRules(rules))
-    c.diagnostics.forEach(d => console.error(d))
-    return r
+    return c.emitRules(c.compileRules(rules))
 }
 
 class TokenColorsCompiler {
-    readonly diagnostics: string[] = []
     constructor(private readonly options: CompileOptions) {}
 
     readonly emitRules = (map: Map<string, StyleInfo>): Required<TextMateTokenColor>[] => {
-        // create one item per styleref group
-        // resolve their styles, naming them and merge them.
-        const items = new Map<string, { styles: NonEmptyArray<Style | null>; selectors: string[] }>()
-        for (const [selector, { style }] of map) {
-            const identity = JSON.stringify(
-                isArray(style) ?
-                    style.sort((a, b) =>
-                        a === null ? +(b !== null)
-                        : b === null ? -(a !== null)
-                        : strcmp(a.name, b.name),
-                    )
-                :   [style],
-            )
-            if (!items.get(identity)?.selectors.push(selector))
-                items.set(identity, { styles: isArray(style) ? style : [style], selectors: [selector] })
+        const items = new Map<string, { style: Style; names: Set<string>; selectors: string[] }>()
+        for (const [selector, { styles }] of map) {
+            const style = this.mergeStyles(styles)
+            const identity = styleIdentity(style)
+            const existing = items.get(identity)
+            if (existing) {
+                existing.selectors.push(selector)
+                existing.names.add(style.name)
+            } else {
+                items.set(identity, { style, names: new Set<string>().add(style.name), selectors: [selector] })
+            }
         }
 
-        return Array.from(items.values(), ({ styles, selectors }) =>
-            toTokenColor(
-                this.combineName(styles),
-                selectors.sort(),
-                mergeStyles(nmap(styles, s => s ?? this.options.unstyle)),
-            ),
+        return Array.from(items.values(), ({ selectors, names, style }) =>
+            toTokenColor(selectors.sort(), names.values().toArray().sort(), style),
         ).sort(({ name: a }, { name: b }) => strcmp(a, b))
     }
-
-    readonly combineName = (styles: SoftNonEmptyArray<Style | null>) =>
-        (isArray(styles) ? styles : [styles]).map(s => s?.name ?? this.options.unstyle.name).join(' ')
 
     readonly compileRules = (rules: readonly Rule[]) => {
         const bindings = new Map<string, StyleInfo>()
 
-        const set = (selector: string, info: StyleInfo) => {
+        const set = (rule: Rule, { selector, styles }: ExpandedRule) => {
             const existing = bindings.get(selector)
             if (existing !== undefined) {
-                this.diagnostics.push(
-                    `${this.combineName(info.style)}: selector ${selector} already assigned to style ${this.combineName(existing.style)}`,
+                throw new Error(
+                    `${this.combineName(styles)}: selector ${selector} already assigned to style ${this.combineName(existing.styles)}`,
                 )
-                return
             }
-            bindings.set(selector, info)
+            bindings.set(selector, { from: rule, styles })
         }
-        const setRule = (rule: TokenRule) =>
-            uniqueSorted(expandSelector(rule.selector)).forEach(s =>
-                set(s, {
-                    from: rule,
-                    style: rule.style,
-                }),
-            )
 
         for (const rule of rules) {
-            if (rule.type !== 'unordered') {
-                setRule(rule)
-                continue
-            }
-
-            for (const trule of rule.rules) {
-                setRule(trule)
-            }
-
-            for (let size = 2; size <= rule.rules.length; size++) {
-                for (const group of combinationsOf(rule.rules, size)) {
-                    const orders = permutations(group)
-                    const selectors = uniqueSorted(
-                        orders.flatMap(ordered =>
-                            cartesian(ordered.map(({ selector }) => (selector ? expandSelector(selector) : []))).map(
-                                parts => parts.join(' '),
-                            ),
-                        ),
-                    )
-                    const style = group.map(g => g.style) as NonEmptyArray<Style | null>
-                    for (const s of selectors) {
-                        set(s, { from: rule, style })
-                    }
-                }
-            }
+            for (const expanded of expandRule(rule)) set(rule, expanded)
         }
 
         return bindings
     }
+
+    private readonly mergeStyles = (styles: NonEmptyArray<Style | null>): Style => {
+        if (styles.length === 1) return styles[0] ?? this.options.unstyle
+
+        const seed: FontStyle[] = []
+        const merged: Style = Object.assign({}, ...styles, {
+            name: this.combineName(styles, true),
+            in: styles.reduce((S, style): FontStyle[] => {
+                const s = (style ?? this.options.unstyle).in
+                if (typeof s === 'string') {
+                    if (s) S.push(s)
+                    else return []
+                } else {
+                    if (s) S.push(...s)
+                }
+                return S
+            }, seed),
+        })
+        if (seed.length === 0 && seed === merged.in) delete merged.in
+        return merged
+    }
+
+    private readonly combineName = (styles: NonEmptyArray<Style | null>, sort = false) => {
+        const n = styles.map(s => s?.name ?? this.options.unstyle.name)
+        if (sort) n.sort()
+        return n.join(' ')
+    }
 }
 
-function expandSelector(s: Selector): string[] {
-    if (typeof s === 'string') {
-        return expandString(s)
-    }
-    if (isArray(s)) {
-        return cartesian(s.map(expandSelector)).map(fjoin('.'))
-    } else if (s.type === 'any') {
-        return s.parts.flatMap(expandSelector)
-    } else {
-        return cartesian(s.parts.map(expandSelector)).map(fjoin(' '))
-    }
+function expandRule(rule: Rule): ExpandedRule[] {
+    return expandPart(rule)
+        .filter((expansion): expansion is ExpandedRule => expansion.styles.length > 0)
+        .map(expansion => ({
+            selector: expansion.selector,
+            styles: expansion.styles as NonEmptyArray<Style | null>,
+        }))
 }
 
-function toTokenColor(name: string, scopes: readonly Scope[], style: Style): Required<TextMateTokenColor> {
+function expandPart(part: Part): Expansion[] {
+    if (part === null) return [{ selector: '', styles: [] }]
+    if (typeof part === 'string') return expandString(part).map(selector => ({ selector, styles: [] }))
+    if (isArray(part)) return expandSelectorArray(part).map(selector => ({ selector, styles: [] }))
+    if (part.type === 'rule') {
+        return expandPart(part.selector).map(({ selector }) => ({
+            selector,
+            styles: [part.style],
+        }))
+    }
+    if (part.type === 'one') return part.parts.flatMap(expandPart)
+    if (part.type === 'any') return expandAny(part.parts)
+    return expandSequence(part.parts, part.type === 'cld' ? ' > ' : ' ')
+}
+
+function expandAny(parts: readonly Part[]): Expansion[] {
+    const expanded: Expansion[] = []
+    const nullable = parts.some(part =>
+        expandPart(part).some(({ selector, styles }) => selector === '' && styles.length === 0),
+    )
+    if (nullable) expanded.push({ selector: '', styles: [] })
+
+    for (let size = 1; size <= parts.length; size++) {
+        for (const group of combinationsOf(parts, size)) {
+            if (group.some(part => part === null)) continue
+            for (const ordered of permutations(group)) expanded.push(...expandSequence(ordered, ' '))
+        }
+    }
+
+    return expanded
+}
+
+function expandSequence(parts: readonly Part[], separator: string): Expansion[] {
+    return cartesian(parts.map(expandPart)).map(expansions => ({
+        selector: joinSelector(
+            expansions.map(({ selector }) => selector),
+            separator,
+        ),
+        styles: expansions.flatMap(({ styles }) => styles),
+    }))
+}
+
+function expandSelectorArray(parts: readonly Selector[]): string[] {
+    return cartesian(parts.map(expandPart)).map(expansions =>
+        expansions
+            .map(({ selector, styles }) => {
+                if (styles.length > 0) throw new Error('rule expressions are invalid inside selector arrays')
+                return selector
+            })
+            .filter(Boolean)
+            .join('.'),
+    )
+}
+
+function mapRuleSelectors(rule: Rule, map: (selector: Selector) => Selector): Rule {
+    if (rule === null) return null
+    if (rule.type === 'rule') return { ...rule, selector: map(rule.selector) }
     return {
-        name,
+        ...rule,
+        parts: rule.parts.map(part =>
+            typeof part === 'string' || part === null || isArray(part) ? part : mapRuleSelectors(part, map),
+        ),
+    }
+}
+
+function toTokenColor(
+    scopes: readonly Scope[],
+    names: readonly string[],
+    style: Omit<Style, 'name'>,
+): Required<TextMateTokenColor> {
+    return {
+        name: names.join(`\n`),
         scope: scopes.length === 1 ? scopes[0] : scopes,
         settings: toSettings(style),
     }
 }
 
-function toSettings(style: Style): TextMateSettings {
+function toSettings(style: Omit<Style, 'name'>): TextMateSettings {
     return {
         ...('fg' in style ? { foreground: style.fg } : undefined),
         ...('in' in style ? { fontStyle: normalizeFontStyle(style.in) } : undefined),
-        ...(style.fontFamily !== undefined ? { fontFamily: style.fontFamily } : undefined),
-        ...(style.fontSize !== undefined ? { fontSize: style.fontSize } : undefined),
-        ...(style.lineHeight !== undefined ? { lineHeight: style.lineHeight } : undefined),
+        ...('fontFamily' in style ? { fontFamily: style.fontFamily } : undefined),
+        ...('fontSize' in style ? { fontSize: style.fontSize } : undefined),
+        ...('lineHeight' in style ? { lineHeight: style.lineHeight } : undefined),
     }
+}
+
+function styleIdentity(style: Style): string {
+    return JSON.stringify(toSettings(style))
 }
 
 function normalizeFontStyle(value: Style['in']) {
     return value === undefined || typeof value === 'string' ? value : uniqueSorted(value).join(' ')
 }
 
-function mergeStyles(styles: readonly [Style, ...Style[]]): Style {
-    if (styles.length === 1) return styles[0]
-    const merged: Style = Object.assign({}, ...styles)
-    merged.in = styles.reduce((S, { in: s }): FontStyle[] => {
-        if (typeof s === 'string') {
-            if (s) S.push(s)
-            else return []
-        } else {
-            if (s) S.push(...s)
-        }
-        return S
-    }, [])
-    return merged
-}
-
-const expand = {
-    split: fsplit('.', ' ', ':'),
-    join: fjoin('.', ' '),
-}
 function expandString(s: string): string[] {
-    return cartesian3(expand.split(s)).map(expand.join)
+    return cartesian(s.split(' ').map(expandDotScope)).map(parts => joinSelector(parts, ' '))
 }
 
-function cartesian3<T>(sets: readonly (readonly (readonly T[])[])[]): T[][][] {
-    return cartesian(sets.map(group => cartesian(group)))
+function expandDotScope(scope: string): string[] {
+    return cartesian(scope.split('.').map(part => part.split(':'))).map(parts => parts.filter(Boolean).join('.'))
 }
+
+function joinSelector(parts: readonly string[], separator: string): string {
+    return parts.filter(Boolean).join(separator)
+}
+
 function cartesian<T>(sets: readonly (readonly T[])[]): T[][] {
     return sets.reduce<T[][]>((rows, set) => rows.flatMap(row => set.map(item => [...row, item])), [[]])
 }

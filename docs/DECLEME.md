@@ -4,27 +4,15 @@
 
 It lets a theme source describe token-color intent with composable selector and rule expressions, then expands those expressions to ordinary VS Code `tokenColors`.
 
-The compiled output is still plain VS Code theme JSON:
+The compiler is intentionally explicit: every emitted rule is a positive TextMate selector with final settings already merged.
 
-```ts
-export type TextMateTokenColor = {
-    name?: string
-    scope: string | string[]
-    settings: TmSettings
-}
-```
+## Core Model
 
-## Core principle
-
-TextMate theme rules are positive selector rules. They do not merge multiple matching styles the way CSS does.
-
-`decleme` provides an authoring algebra where styles can be composed explicitly, then compiles the result to explicit positive TextMate rules.
-
-The source model is:
+TextMate token color rules do not merge all matching rules like CSS. `decleme` provides a small algebra for composing selectors and styles before emitting plain TextMate rules.
 
 ```txt
 selector expression -> selector set
-rule expression     -> rule set
+rule expression     -> styled selector set
 ```
 
 A selector is a sequence of scopes:
@@ -39,7 +27,7 @@ A scope is a dotted TextMate scope:
 keyword.control.as
 ```
 
-A dot scope can also be built from an array:
+A dotted scope can also be built with an array:
 
 ```ts
 ['keyword', 'control', 'as']
@@ -56,8 +44,8 @@ export type FontStyle =
 
 export type Style = {
     name: string
-    fg?: unknown
-    in?: FontStyle | FontStyle[]
+    fg?: ColorInstance
+    in?: FontStyle | FontStyle[] | ''
     fontFamily?: string
     fontSize?: number
     lineHeight?: number
@@ -75,28 +63,9 @@ fontSize   -> settings.fontSize
 lineHeight -> settings.lineHeight
 ```
 
-`in` is normalized by sorting and deduplicating font-style values.
+`in` is normalized by sorting and deduplicating font-style values. `in: ''` emits `fontStyle: ''` and clears accumulated font styles.
 
-Style merging is ordered.
-
-When styles are merged:
-
-```txt
-A & B
-```
-
-then `B` is applied after `A`.
-
-Rules:
-
-- `fg`, `fontFamily`, `fontSize`, and `lineHeight` are overwritten by later styles when present.
-- `in` values are unioned.
-- `in: ''` clears the accumulated font style and emits `fontStyle: ''`.
-- Merged names are joined from display names in application order.
-
-This means style merging is not commutative.
-
-Example:
+Style merging is ordered. Later styles overwrite `fg`, `fontFamily`, `fontSize`, and `lineHeight` when present. Font styles are accumulated unless a later style uses `in: ''`.
 
 ```ts
 const A = { name: 'A', fontSize: 10 }
@@ -111,37 +80,36 @@ B & A -> fontSize 10
 ## API
 
 ```ts
-compileTokenColors(rules: RuleExpr[], options?: CompileOptions): TextMateTokenColor[]
+compileTokenColors(rules: readonly Rule[], options?: CompileOptions): TextMateTokenColor[]
 ```
 
-Compiles decleme rule expressions to VS Code token-color entries.
+Compiles rule expressions to VS Code token-color entries.
 
-The compiler:
+```ts
+type CompileOptions = {
+    unstyle: Style
+}
+```
 
-1. expands selector and rule expressions
-2. canonicalizes selectors
-3. rejects duplicate canonical selectors
-4. merges styles for composed rules
-5. groups final selectors by equivalent TextMate settings
-6. emits `tokenColors`
+`unstyle` is used when a rule style is `null`. If omitted, the default is `{ name: 'unstyled', in: '' }`.
 
-## Rule algebra
+Other exports:
+
+```ts
+r(style, ...selectors)
+one(...parts)
+any(...parts)
+dsc(...parts)
+cld(...parts)
+language(scopeName, ...rules)
+semantic(style)
+```
+
+## Expressions
 
 ### `r(style, ...selectors)`
 
-Creates rules assigning a style to every selector produced by a selector expression.
-
-```ts
-r(s.text, 'string')
-```
-
-produces:
-
-```txt
-string -> text
-```
-
-With alternatives:
+Creates a token rule assigning `style` to every selector produced by the selector expressions. Multiple selector arguments are alternatives, equivalent to `one(...)`.
 
 ```ts
 r(s.text, 'markup.raw', 'markup.inline.raw')
@@ -154,91 +122,11 @@ markup.raw        -> text
 markup.inline.raw -> text
 ```
 
-`r` accepts combines multiple selectors with `one(...)`.
-
-### `dsc(...parts)`
-
-Creates descendant composition.
-
-For selector expressions:
-
-```ts
-dsc('a', 'b', 'c')
-```
-
-produces:
-
-```txt
-a b c
-```
-
-For rule expressions, `dsc` composes the selectors and merges styles in order.
-
-Example:
-
-```ts
-const r1 = r(A, 'a')
-const r2 = r(B, 'b')
-
-dsc(r1, r2)
-```
-
-produces:
-
-```txt
-a b -> A & B
-```
-
-Mixed selector/rule expressions are allowed.
-
-```ts
-dsc('a', r(B, 'b'))
-```
-
-is equivalent to:
-
-```ts
-r(B, dsc('a', 'b'))
-```
-
-and produces:
-
-```txt
-a b -> B
-```
-
-Example:
-
-```ts
-dsc('meta.import', 'keyword.control.as:from')
-```
-
-expands to:
-
-```txt
-meta.import keyword.control.as
-meta.import keyword.control.from
-```
-
-The final scope is the target token scope in VS Code’s TextMate matching grammar. Earlier scopes are ancestors.
-
-For simple selectors, a string with spaces may be parsed as a descendant selector:
-
-```ts
-'meta.import keyword.control.as:from'
-```
-
-is equivalent to:
-
-```ts
-dsc('meta.import', 'keyword.control.as:from')
-```
+`style` may be `null`; `compileTokenColors` resolves it through `options.unstyle`.
 
 ### `one(...parts)`
 
-`one` means alternatives.
-
-For selectors:
+`one` means alternatives. It does not compose branches.
 
 ```ts
 one('a', 'b')
@@ -264,43 +152,9 @@ a -> A
 b -> B
 ```
 
-No combinations are produced.
-
-So:
-
-```ts
-dsc(r(A, 'a'), one(r(B, 'b'), r(C, 'c')), r(D, 'd'))
-```
-
-produces:
-
-```txt
-a b d -> A & B & D
-a c d -> A & C & D
-```
-
-Use `one` when exactly one branch should be selected.
-
-```ts
-r(s.text, one('string.quoted', 'string.template'))
-```
-
-expands to:
-
-```txt
-string.quoted   -> text
-string.template -> text
-```
-
-`one` does not compose branches.
-
 ### `any(...parts)`
 
-`any` means any non-empty combination of the provided parts.
-
-It is the replacement for the old `unordered`.
-
-For rules:
+`any` means every non-empty ordered combination of the provided non-null parts.
 
 ```ts
 any(r(A, 'a'), r(B, 'b'))
@@ -309,129 +163,68 @@ any(r(A, 'a'), r(B, 'b'))
 produces:
 
 ```txt
-a     -> A
-b     -> B
-a b   -> A & B
-b a   -> B & A
+a   -> A
+b   -> B
+a b -> A & B
+b a -> B & A
 ```
 
-For three rules:
+When `null` is included, `any` also permits the empty sequence:
 
 ```ts
-any(r(A, 'a'), r(B, 'b'), r(C, 'c'))
+any(null, r(A, 'a'))
 ```
 
-produces all non-empty ordered combinations:
+can produce either nothing or:
 
 ```txt
-a       -> A
-b       -> B
-c       -> C
-
-a b     -> A & B
-b a     -> B & A
-a c     -> A & C
-c a     -> C & A
-b c     -> B & C
-c b     -> C & B
-
-a b c   -> A & B & C
-a c b   -> A & C & B
-b a c   -> B & A & C
-b c a   -> B & C & A
-c a b   -> C & A & B
-c b a   -> C & B & A
+a -> A
 ```
-
-For selectors, `any` uses the same structure, but there are no styles to merge.
-
-```ts
-any('a', 'b')
-```
-
-produces:
-
-```txt
-a
-b
-a b
-b a
-```
-
-This differs from:
-
-```ts
-one('a', 'b')
-```
-
-which only produces:
-
-```txt
-a
-b
-```
-
-So:
-
-```ts
-dsc('a', one('b', 'c'), 'c')
-```
-
-produces:
-
-```txt
-a b c
-a c c
-```
-
-while:
-
-```ts
-dsc('a', any('b', 'c'), 'c')
-```
-
-produces:
-
-```txt
-a b c
-a c c
-a b c c
-a c b c
-```
-
-For ordinary descendant selectors this may often match the same tokens, because TextMate descendant matching is not exact sequence matching. It becomes meaningful when direct-child selectors are used.
 
 Use `any` when branches may co-occur and styles should compose.
 
-Markdown example:
+### `dsc(...parts)`
+
+`dsc` composes parts with TextMate descendant spacing.
 
 ```ts
-any(
-    r(s.emphasis, 'markup.italic'),
-    r(s.strong, 'markup.bold'),
-)
+dsc('a', 'b', 'c')
 ```
 
-expands to:
+produces:
 
 ```txt
-markup.italic             -> emphasis
-markup.bold               -> strong
-markup.italic markup.bold -> emphasis & strong
-markup.bold markup.italic -> strong & emphasis
+a b c
 ```
 
-If both styles only affect `in`, both combined rules emit:
+For rule expressions, selectors compose and styles merge in order:
+
+```ts
+dsc(r(A, 'a'), r(B, 'b'))
+```
+
+produces:
 
 ```txt
-fontStyle: 'italic bold'
+a b -> A & B
 ```
 
-If styles assign conflicting ordered fields, order matters.
+Mixed selector and rule expressions are allowed:
+
+```ts
+dsc('meta.import', r(B, 'keyword.control.as:from'))
+```
+
+produces:
+
+```txt
+meta.import keyword.control.as   -> B
+meta.import keyword.control.from -> B
+```
 
 ### `cld(...parts)`
 
-`cld` creates direct-child composition using TextMate’s `>` combinator.
+`cld` composes parts with TextMate's direct-child combinator.
 
 ```ts
 cld('a', 'b', 'c')
@@ -443,106 +236,39 @@ produces:
 a > b > c
 ```
 
-With `any`:
+`cld` otherwise follows the same selector/rule composition rules as `dsc`.
 
-```ts
-cld('a', any('b', 'c'), 'c')
-```
+### `null`
 
-produces:
-
-```txt
-a > b > c
-a > c > c
-a > b > c > c
-a > c > b > c
-```
-
-`dsc` means descendant order.
-
-`cld` means direct-child order.
-
-### Dot nesting
-
-An array creates dotted scope nesting.
-
-```ts
-['keyword', 'control', 'flow']
-```
-
-expands to the selector:
-
-```txt
-keyword.control.flow
-```
-
-Each array item is expanded before joining, so arrays can contain alternatives.
-
-Example:
-
-```ts
-['keyword', one('control', 'operator'), 'flow']
-```
-
-expands to:
-
-```txt
-keyword.control.flow
-keyword.operator.flow
-```
-
-Arrays only make sense for selector expressions.
-
-Arrays of rule expressions are invalid because there is no meaningful rule-level dot nesting.
-
-Invalid:
-
-```ts
-[r(A, 'a'), r(B, 'b')]
-```
-
-### Null expression
-
-`null` is a valid expression.
-
-It matches nothing.
-
-It is useful for optional composition.
+`null` matches nothing and carries no style. It is useful for optional composition.
 
 ```ts
 one(null, r(s.declaration, 'markup.heading'))
 ```
 
-means:
+means either no rule contribution or:
 
 ```txt
-nothing
-or
 markup.heading -> declaration
 ```
 
-### Selector values
+## Selector Syntax
+
+Strings use compact selector syntax.
+
+Spaces create descendant selectors:
 
 ```ts
-type SelectorExpr =
-    | null
-    | string
-    | readonly SelectorExpr[]
-    | OneExpr
-    | AnyExpr
-    | DescExpr
-    | ChildExpr
+'meta.import keyword.control.as:from'
 ```
 
-Strings are compact selector syntax.
+is equivalent to:
 
-Arrays create dot nesting.
+```ts
+dsc('meta.import', 'keyword.control.as:from')
+```
 
-Helpers create selector expressions.
-
-### Colon alternatives
-
-Inside a string atom, `:` creates one-alternatives for the nearest dot segment.
+Colon alternatives are local to the nearest dot segment:
 
 ```ts
 'keyword.control.flow:conditional'
@@ -555,7 +281,7 @@ keyword.control.flow
 keyword.control.conditional
 ```
 
-An empty alternative means the current segment is omitted:
+An empty colon alternative omits that segment:
 
 ```ts
 'keyword.control:.ts'
@@ -568,32 +294,69 @@ keyword.control.ts
 keyword.ts
 ```
 
-equivalently to
+Arrays create dotted scope nesting. Each array item is expanded before joining:
 
 ```ts
-['keyword', one('control', null), 'ts']
+['keyword', one('control', 'operator'), 'flow']
 ```
 
-Colon alternatives are local to their dot segment. Cross-products are produced when multiple segments contain alternatives.
+expands to:
 
-## Rule canonicalization
+```txt
+keyword.control.flow
+keyword.operator.flow
+```
 
-After expansion, every rule has:
+Arrays are selector-only. Rule expressions inside selector arrays are invalid.
+
+## Language Scoping
 
 ```ts
-type ExpandedRule = {
-    selector: Selector
-    styles: Style[]
+language('ts', r(s.declaration, 'keyword.control.import'))
+```
+
+suffixes each selector scope with the language scope:
+
+```txt
+keyword.control.import.ts -> declaration
+```
+
+For composed rules, `language` maps every nested token rule selector before compilation.
+
+## Semantic Token Settings
+
+```ts
+semantic(style)
+```
+
+Converts a decleme style fragment to a VS Code semantic token color value.
+
+If the style has a foreground and no font style, or an empty font-style array, it returns the foreground color directly:
+
+```ts
+semantic({ fg: colors.green })
+```
+
+Otherwise it returns an object with `foreground` and `fontStyle`:
+
+```ts
+semantic({ fg: colors.green, in: ['italic', 'bold'] })
+```
+
+produces a semantic token setting equivalent to:
+
+```ts
+{
+    foreground: colors.green,
+    fontStyle: 'bold italic',
 }
 ```
 
-The compiler canonicalizes selectors.
+## Canonicalization And Emission
 
-A canonical selector may appear only once.
+The compiler expands expressions, canonicalizes selectors, merges styles for composed rules, groups selectors by equivalent final TextMate settings, and emits stable `tokenColors`.
 
-This is an error even when styles are identical.
-
-Examples that must fail:
+A canonical selector may appear only once. Duplicate selector definitions throw, even when the styles are identical:
 
 ```ts
 one(r(s.text, 'string'), r(s.text, 'string'))
@@ -603,27 +366,9 @@ one(r(s.text, 'string'), r(s.text, 'string'))
 any(r(s.text, 'string'), r(s.text, 'string'))
 ```
 
-Reason:
+Both fail because duplicate selector definitions introduce drift. To apply multiple styles to the same selector, intentionally compose them through `any`, `dsc`, `cld`, or an explicit style object.
 
-```txt
-duplicate selector definitions introduce drift
-```
-
-If a user wants multiple styles on the same selector, they must intentionally produce a combined style through `any`, `dsc`, or an explicit style object.
-
-## Source order
-
-Source order must not affect selector meaning.
-
-The compiler must reject duplicate canonical selectors instead of allowing later rules to override earlier rules.
-
-Rule order is only an emission detail, but it must be stable.
-
-## TextMate emission
-
-After expansion and canonicalization, rules are grouped by equivalent final settings.
-
-Example:
+Equivalent final settings are grouped into one token-color entry:
 
 ```ts
 [
@@ -637,23 +382,18 @@ may emit:
 ```ts
 {
     name: 'text',
-    scope: [
-        'string.quoted',
-        'string.template',
-    ],
+    scope: ['string.quoted', 'string.template'],
     settings: {
         foreground: '#...',
     },
 }
 ```
 
-The emitted rules are ordinary positive TextMate token-color entries.
+Rule order is only an emission detail. It does not provide override semantics.
 
-## Sample patterns
+## Sample Pattern
 
-### `null` with `one`
-
-This pattern expresses optional structure:
+This pattern expresses optional heading structure followed by any combination of markdown inline styles:
 
 ```ts
 dsc(
@@ -667,36 +407,20 @@ dsc(
 )
 ```
 
-This means:
+It produces the standalone inline styles, the optional heading rule, and heading-first combinations such as:
 
 ```txt
-the any-combination of null/italic/bold/quote
-optionally preceded by heading declaration
-```
-
-null in any naturally permits it to match the empty sequence.
-
-This produces:
-
-```txt
-markup.heading -> declaration
-
-markup.italic -> emphasis
-markup.bold   -> strong
-markup.quote  -> quote
-markup.heading markup.italic -> declaration & emphasis
-markup.heading markup.bold   -> declaration & strong
-markup.heading markup.quote  -> declaration & quote
-
-markup.italic markup.bold -> emphasis & strong
-markup.bold markup.italic -> strong & emphasis
-...
+markup.heading                           -> declaration
+markup.italic                            -> emphasis
+markup.bold                              -> strong
+markup.quote                             -> quote
+markup.heading markup.italic             -> declaration & emphasis
+markup.heading markup.bold               -> declaration & strong
+markup.heading markup.quote              -> declaration & quote
 markup.heading markup.italic markup.bold -> declaration & emphasis & strong
-markup.heading markup.bold markup.italic -> declaration & strong & emphasis
-...
 ```
 
-It does not produce:
+It does not produce heading-last selectors such as:
 
 ```txt
 markup.italic markup.heading

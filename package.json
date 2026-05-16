@@ -10,7 +10,8 @@
     "Themes"
   ],
   "scripts": {
-    "build": "tsx generator/color-theme.ts"
+    "build": "tsx generator/color-theme.ts",
+    "test": "tsx --test generator/decleme.test.ts"
   },
   "type": "module",
   "contributes": {
