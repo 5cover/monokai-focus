@@ -1,6 +1,8 @@
 .vscode/
 .vscode-test/
 .gitignore
+pnpm-lock.yaml
+tsconfig.json
 vsc-extension-quickstart.md
 generator/
 dist/
