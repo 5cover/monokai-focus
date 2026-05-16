@@ -31,7 +31,7 @@ namespace NightOwl.demo
         /// <returns></returns>
         public async Task<string> TestMethod(string testParam)
         {
-            for(var i = 0; i <= 5; i++)
+            for(var i = 0; i <= 5; i+1)
             {
                 testParam.Trim();
                 _testField?.Trim();
@@ -42,6 +42,8 @@ namespace NightOwl.demo
                 // Hello this is a normal comment
                 new List<string>().Where(c => c == "Test");
             }
+
+            if(1) {} else {}
 
             return await Task.FromResult(testParam);
         }

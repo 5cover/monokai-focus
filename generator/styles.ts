@@ -139,7 +139,7 @@ export const style = {
      * * super
      * * arguments
      */
-    langvar: { name: 'language-variable', fg: colors.purple, in: 'italic' },
+    langvar: { name: 'language-variable', fg: colors.purple },
     /** Inert (behaviorless, contextless) values. They seed logic.
      *
      * Examples

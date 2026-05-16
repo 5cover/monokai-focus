@@ -9,5 +9,4 @@ export default one(
         any(null, r(s.emphasis, 'markup.italic'), r(s.strong, 'markup.bold')),
     ),
     r(s.declaration, 'entity.name.section'),
-    r(s.meta, 'punctuation.section.embedded'),
 )

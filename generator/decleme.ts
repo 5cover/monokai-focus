@@ -45,8 +45,8 @@ const defaultOptions: CompileOptions = {
     },
 }
 
-export function language(scopeName: Scope, ...rules: Rule[]) {
-    return dsc(['source', scopeName], one(...rules))
+export function language(scopeName: Selector, ...rules: Rule[]) {
+    return dsc(scopeName, one(...rules))
 }
 
 export function semantic(style: Pick<Style, 'fg' | 'in'>): TokenStylingStyle {

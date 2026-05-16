@@ -43,7 +43,6 @@ try {
       <div>It's up for the one who uses me to render me correctly. <a href='/ligaPlanAccion'>Or not.</a></div>"
     $collectionWithItems.Add($temp) | Out-Null
     Write-Host "My collection has" $collectionWithItems.Count "item(s)" -ForegroundColor Green
-
     #Calling some other scripts. Sometimes its nice to have a "master" script and call subscripts with other functions / actions
     .\otherscript.ps1 "Parameter ?"
     .\thisonewithoutparams.ps1

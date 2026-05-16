@@ -6,7 +6,13 @@ export default one(
     r(s.deprecated, 'invalid.deprecated'),
     r(s.comment, 'comment'),
     r(s.documentation, 'comment.:block.documentation'),
-    r(s.documentationSyntax, 'storage.type.class.jsdoc', 'constant.string.documentation', 'keyword.other.phpdoc'),
+    r(
+        s.documentationSyntax,
+        'storage.type.class.jsdoc:doxygen',
+        'constant.string.documentation',
+        'keyword.other.phpdoc',
+        'keyword.operator.documentation',
+    ),
     r(s.leaf, 'constant'),
     r(s.text, 'string'),
     r(

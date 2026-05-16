@@ -1,7 +1,7 @@
 import { language, r } from '../../decleme.ts'
 import { style as s } from '../../styles.ts'
 export default language(
-    'tsx:ts:js:jsx',
+    'source.tsx:ts:js', // jsx is source.js.jsx
     r(s.langvar, 'keyword.control.import'),
     r(s.abstraction, 'keyword.control.require'),
     r(

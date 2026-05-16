@@ -1,8 +1,8 @@
-import { any, language, r } from '../../decleme.ts'
+import { any, language, one, r } from '../../decleme.ts'
 import { style as s } from '../../styles.ts'
 
 export default language(
-    'markdown',
+    one('source.mdx', 'text.html.markdown'),
     r(s.declaration, 'meta.separator', 'punctuation.definition.list.begin'),
-    r(null, 'keyword.operator'),
+    r(s.meta, 'punctuation.section.embedded'),
 )

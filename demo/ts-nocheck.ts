@@ -70,7 +70,9 @@ class Class extends URL {
     }
 
 }
-{function* bar()}
+{function* bar(){
+    yield* []
+}}
 {async function bar() }
 1
 import 'module'
