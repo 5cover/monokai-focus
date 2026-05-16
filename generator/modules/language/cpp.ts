@@ -5,7 +5,6 @@ export default language(
     'source.c:cpp',
     r(s.dim, 'punctuation.separator.namespace.access'),
     r(s.abstraction, 'punctuation.section.arguments:parameters'),
-    r(s.instruction, 'kewyord.wordlike'),
     r(s.operation, 'keyword.operator.cast'),
     r(s.declaration, 'punctuation.section.angle-brackets.begin:end.template.definition'),
     r(
