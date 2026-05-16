@@ -1,7 +1,7 @@
 import { dsc, one, r, type Rule } from '../decleme.ts'
 import { style as s } from '../styles.ts'
 
-export default [
+export default one(
     r(s.illegal, 'invalid.illegal'),
     r(s.deprecated, 'invalid.deprecated'),
     r(s.comment, 'comment'),
@@ -22,4 +22,4 @@ export default [
             ),
         ),
     ),
-] satisfies Rule[]
+)

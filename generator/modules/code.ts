@@ -1,18 +1,18 @@
-import { one, r, type Rule } from '../decleme.ts'
+import { one, r } from '../decleme.ts'
 import { style as s } from '../styles.ts'
 
-export default [
+export default one(
     r(s.parameter, 'variable.parameter'),
     r(
         s.type,
         'entity.name.type',
         'entity.other.inherited-class',
         'punctuation.definition.typeparameters',
-        'punctuation.section.angle-brackets.begin:end.template.call',
         'storage.type',
         'support:type',
     ),
-    r(null, 'support.type.property-name', 'punctuation.accessor.optional'),
+    r(s.langvar, 'variable.language'),
+    r(null, 'variable', 'support.type.property-name', 'punctuation.accessor.optional'),
     r(
         s.abstraction,
         'punctuation.section.arguments:parameters.begin:end',
@@ -22,12 +22,7 @@ export default [
         'punctuation.decorator',
         'meta.decorator variable.other.readwrite',
     ),
-    r(
-        s.declaration,
-        ['keyword', one('declaration', 'other.typedef:import', 'type.new')],
-        'punctuation.section.angle-brackets.begin:end.template.definition',
-        'storage.modifier',
-    ),
+    r(s.declaration, ['keyword', one('declaration', 'other.typedef:import', 'type.new')], 'storage.modifier'),
     r(s.operation, [
         'keyword',
         one(
@@ -50,4 +45,4 @@ export default [
     ]),
     r(s.dim, 'punctuation.accessor'),
     r(s.meta, one('keyword.control.directive', 'entity.name.function.preprocessor', 'keyword.preprocessor')),
-] satisfies Rule[]
+)

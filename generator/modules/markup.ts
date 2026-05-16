@@ -1,6 +1,6 @@
-import { any, dsc, one, r, type Rule } from '../decleme.ts'
+import { any, dsc, one, r } from '../decleme.ts'
 import { style as s } from '../styles.ts'
-export default [
+export default one(
     r(s.abstraction, 'support.class.component'),
     r(s.leaf, 'entity.name.tag', 'punctuation.definition.tag'),
     r(s.text, 'markup.raw', 'markup.inline.raw'),
@@ -10,4 +10,4 @@ export default [
     ),
     r(s.declaration, 'entity.name.section'),
     r(s.meta, 'punctuation.section.embedded'),
-] satisfies Rule[]
+)

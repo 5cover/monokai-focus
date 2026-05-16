@@ -12,18 +12,4 @@ import cpp from './modules/language/cpp.ts'
 import go from './modules/language/go.ts'
 import ini from './modules/language/ini.ts'
 
-export default [
-    ...core,
-    ...code,
-    ...styling,
-    ...markup,
-    ...python,
-    ...csharp,
-    ...yaml,
-    ...powershell,
-    ...markdown,
-    ...ecmascript,
-    ...cpp,
-    ...go,
-    ...ini,
-]
+export default [core, code, styling, markup, python, csharp, yaml, powershell, markdown, ecmascript, cpp, go, ini]

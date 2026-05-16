@@ -45,8 +45,8 @@ const defaultOptions: CompileOptions = {
     },
 }
 
-export function language(scopeName: Scope, ...rules: Rule[]): Rule[] {
-    return rules.map(rule => mapRuleSelectors(rule, selector => [selector, scopeName]))
+export function language(scopeName: Scope, ...rules: Rule[]) {
+    return dsc(['source', scopeName], one(...rules))
 }
 
 export function semantic(style: Pick<Style, 'fg' | 'in'>): TokenStylingStyle {
@@ -221,17 +221,6 @@ function expandSelectorArray(parts: readonly Selector[]): string[] {
             .filter(Boolean)
             .join('.'),
     )
-}
-
-function mapRuleSelectors(rule: Rule, map: (selector: Selector) => Selector): Rule {
-    if (rule === null) return null
-    if (rule.type === 'rule') return { ...rule, selector: map(rule.selector) }
-    return {
-        ...rule,
-        parts: rule.parts.map(part =>
-            typeof part === 'string' || part === null || isArray(part) ? part : mapRuleSelectors(part, map),
-        ),
-    }
 }
 
 function toTokenColor(

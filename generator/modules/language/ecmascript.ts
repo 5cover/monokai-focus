@@ -1,8 +1,8 @@
-import { any, language, r } from '../../decleme.ts'
+import { language, r } from '../../decleme.ts'
 import { style as s } from '../../styles.ts'
 export default language(
     'tsx:ts:js:jsx',
-    r(s.langvar, 'variable.language.super:this:arguments', 'keyword.control.import'),
+    r(s.langvar, 'keyword.control.import'),
     r(s.abstraction, 'keyword.control.require'),
     r(
         s.declaration,
