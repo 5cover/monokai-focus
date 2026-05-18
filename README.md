@@ -35,13 +35,6 @@ Compiler builds theme file
 
 The primitive: the binding. A style => style association. The compiler must errors in case of conflict between two bindings.
 
-todo:
-
-- no more resets
-- no more on/no
-- unstyled null stylekey
-- analysis: check no two selectors equivalent
-
 implementation
 
 - compile rule selectors into strings.

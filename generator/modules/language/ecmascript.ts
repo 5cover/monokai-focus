@@ -1,4 +1,4 @@
-import { language, r } from '../../decleme.ts'
+import { dsc, language, r } from '../../decleme.ts'
 import { style as s } from '../../styles.ts'
 export default language(
     'source.tsx:ts:js', // jsx is source.js.jsx
@@ -6,13 +6,10 @@ export default language(
     r(s.abstraction, 'keyword.control.require'),
     r(
         s.declaration,
-        'constant.language.import-export-all',
-        'keyword.control.as:from',
-        'meta.import keyword.control.import',
-        'keyword.control.export',
-        'keyword.type',
-        'meta.export:import:import-equals keyword.control.default',
         'storage.type',
+        'constant.language.import-export-all',
+        'keyword.control.as:from:export:default',
+        dsc('meta.import:import-equals', 'keyword.control.import'),
     ),
     r(null, 'storage.type.function.arrow'),
 )
