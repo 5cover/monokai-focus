@@ -8,7 +8,7 @@ export default language(
         s.declaration,
         'storage.type',
         'constant.language.import-export-all',
-        'keyword.control.as:from:export:default',
+        'keyword.control.as:from:export:default:type',
         dsc('meta.import:import-equals', 'keyword.control.import'),
     ),
     r(null, 'storage.type.function.arrow'),

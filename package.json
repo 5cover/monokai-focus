@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "build": "tsx generator/color-theme.ts",
-    "test": "tsx --test generator/decleme.test.ts"
+    "test": "tsx --test generator/decleme.test.ts",
+    "pack": "vsce pack --no-git-tag-version --no-update-package-json --no-dependencies --allow-package-all-secrets --allow-package-all-secrets"
   },
   "type": "module",
   "contributes": {

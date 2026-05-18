@@ -69,6 +69,8 @@ class Class extends URL {
 1
 import 'module'
 import { foo as bar } from 'module'
+import { type foo as bar } from 'module'
+import type { foo as bar } from 'module'
 import * as baz from 'module'
 import { default as ff } from 'module'
 import fs = require('fs')
@@ -85,6 +87,7 @@ export default {}
 export default import.meta
 export default await import()
 export type FontStyle = 'italic' | 'bold' | 'underline' | 'strikethrough'
+export { type a }
 export interface A {}
 
 {
@@ -92,7 +95,7 @@ export interface A {}
 }
 using a = 1
 
-interface A extends URL {
+interface DGD extends URL {
     prop: 1
     prop: number
 }
