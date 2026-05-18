@@ -70,10 +70,10 @@ test('dsc and cld compose selectors and styles in order', () => {
 })
 
 test('selector arrays create dotted scopes and reject rule expressions', () => {
-    assert.deepEqual([...byScope(compile([r(A, ['keyword', one('control', 'operator'), 'flow'])])).keys()], [
-        'keyword.control.flow',
-        'keyword.operator.flow',
-    ])
+    assert.deepEqual(
+        [...byScope(compile([r(A, ['keyword', one('control', 'operator'), 'flow'])])).keys()],
+        ['keyword.control.flow', 'keyword.operator.flow'],
+    )
 
     const invalidSelector = ['keyword', r(B, 'control')] as unknown as Parameters<typeof r>[1]
     assert.throws(() => compile([r(A, invalidSelector)]), /rule expressions are invalid/)
@@ -100,13 +100,13 @@ test('groups identical final settings with stable sorted scopes', () => {
 })
 
 test('language suffixes every emitted rule selector', () => {
-    const rules = compile(language('source.ts', any(r(A, 'a'), r(B, 'b'))))
+    const rules = compile([language('source.ts', any(r(A, 'a'), r(B, 'b')))])
 
     assert.deepEqual([...byScope(rules).keys()].sort(), [
-        'a.source.ts',
-        'a.source.ts b.source.ts',
-        'b.source.ts',
-        'b.source.ts a.source.ts',
+        'source.ts a',
+        'source.ts a b',
+        'source.ts b',
+        'source.ts b a',
     ])
 })
 
