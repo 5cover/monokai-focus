@@ -71,6 +71,7 @@ export const style = {
      */
     declaration: { name: 'declaration', fg: colors.blue },
     deprecated: { name: 'deprecated', in: 'strikethrough' },
+    strikethrough: { name: 'strikethrough', in: 'strikethrough' },
     /**
      * Structurally low-signal tokens.
      *

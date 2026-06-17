@@ -6,7 +6,7 @@ export default one(
     r(s.text, 'markup.raw', 'markup.inline.raw'),
     dsc(
         one(null, r(s.declaration, 'markup.heading'), r(s.quote, 'markup.quote')),
-        any(null, r(s.emphasis, 'markup.italic'), r(s.strong, 'markup.bold')),
+        any(null, r(s.emphasis, 'markup.italic'), r(s.strong, 'markup.bold'), r(s.strikethrough, 'markup.strikethrough')),
     ),
     r(s.declaration, 'entity.name.section'),
 )

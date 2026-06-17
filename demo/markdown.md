@@ -4,6 +4,16 @@
 
 ![Preview](images/preview.gif)
 
+<https://example.com>
+
+
+    aa
+    bb
+
+**[Visual Studio Code](https://code.visualstudio.com/)**
+
+## <https://example.com>
+
 # Installation
 
 1. Install [Visual Studio Code](https://code.visualstudio.com/)
@@ -14,8 +24,21 @@
 6. Click **Reload** to reload the Code
 7. File > Preferences > Color Theme > **Night Owl**
 
-- [x] check check 12 12
+- [x] check check 12 12 [1]
 - [ ] check check 12 12
+
+* a
+* b
+  + c
+  + d
+    - e
+    - f
+
+http://www.example.com
+
+
+
+***~~stricken~~***
 
 |a    |b    |c    |
 |:----|:---:|----:|
@@ -28,6 +51,8 @@ Heading 1
 Heading 2
 --------------
 
+***
+
 ### Heading 3
 
 <details></details>
@@ -39,3 +64,12 @@ aa
 ```js
 const codeblock = 1
 ```
+
+Here's a simple footnote,[1] and here's a longer one.[second]
+
+[1]: example.com
+
+[second]: abc.efg
+
+
+
